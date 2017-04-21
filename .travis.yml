@@ -1,0 +1,24 @@
+sudo: false
+language: cpp
+os: 
+ - osx
+ - linux
+compiler:
+ - clang
+ - gcc
+before_script: 
+  - mkdir build
+  - cd build
+  - cmake ..
+script: make test
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install ragel   ; fi
+
+addons:
+ apt:
+  packages:
+   - ragel
+
+
+#  - brew install cmake # not needed.

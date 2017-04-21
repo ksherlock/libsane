@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
+set (PROJECT_NAME "libsane")
 set (PROJECT_TYPE "CXX")
 
 set(CMAKE_CXX_STANDARD 11)
@@ -17,14 +18,14 @@ add_custom_command(
 )
 
 
-add_library(libsane
+add_library(sane
 	saneparser.cpp
 	sane.cpp
 )
 
 
 
-externalproject_add(Catch-External
+ExternalProject_Add(Catch-External
 	DOWNLOAD_NO_EXTRACT 1
 	URL https://github.com/philsquared/Catch/releases/download/v1.9.1/catch.hpp
 	URL_HASH MD5=e392ca7010ec9caeb7a9899659cfdd31
@@ -37,7 +38,7 @@ add_library(Catch INTERFACE)
 add_dependencies(Catch Catch-External)
 
 add_executable(sane_test sane_test.cpp)
-target_link_libraries(sane_test Catch libsane)
+target_link_libraries(sane_test Catch sane)
 
 enable_testing()
 add_test(NAME Sanity COMMAND sane_test)
