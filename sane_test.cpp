@@ -36,12 +36,12 @@ TEST_CASE( "Dec2Str(Float)", "[dec2str]") {
 		REQUIRE(s == " 1.23e+202");
 	}
 
-	SECTION( " 1.23e+1002" ) {
-		SANE::decimal d{ 0, 1000, "123" };
+	SECTION( "-1.2300e+1002" ) {
+		SANE::decimal d{ 1, 1000, "123" };
 		SANE::decform df{ SANE::decform::FLOATDECIMAL, 5};
 
 		dec2str(df, d, s);
-		REQUIRE(s == " 1.23e+1002");
+		REQUIRE(s == "-1.2300e+1002");
 	}
 
 	SECTION( " 4e-30" ) {

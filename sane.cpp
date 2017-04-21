@@ -93,10 +93,16 @@ namespace SANE {
 
 			// 1 leading digit.
 			s.push_back(sig[0]);
-			if (sig.length() > 1) {
+			if (sig.length() > 1 || digits > 1) {
 				s.push_back('.');
 				s.append(sig.substr(1));
+				int fudge = sig.length() - 1;
+				exp += fudge;
+				digits -= fudge;
 			}
+			if (digits > 80) { s = "?"; return; }
+			while (digits > 1) { s.push_back('0'); --digits; }
+
 			s.push_back('e');
 			if (exp < 0) {
 				// to_string() will include the -
@@ -105,6 +111,10 @@ namespace SANE {
 				s.push_back('+');
 				s.append(std::to_string(exp));
 			}
+
+			// if > 80 in length, return '?'
+			if (s.length() > 80) s = "?";
+
 			return;
 		}
 		else
