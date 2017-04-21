@@ -28,6 +28,8 @@
 #include "sane.h"
 
 #include <ctype.h>
+#include <math.h>
+ 
 #include <numeric>
 #include <algorithm>
 
@@ -168,6 +170,46 @@ namespace SANE {
 			// if > 80 in length, return '?'
 			if (s.length() > 80) s = "?";
 		}
+	}
+
+
+	long double dec2x(const decimal &d) {
+		if (d.sig.empty()) {
+			return d.sgn ? -0.0 : 0.0;
+		}
+		if (d.sig[0] == 'I') {
+			return d.sgn? -INFINITY : INFINITY;
+		}
+		if (d.sig[0] == 'N') {
+			// todo -- NaN type?
+			return d.sgn ? -NAN : NAN;
+		}
+
+		long double tmp = 0;
+		try {
+			size_t pos;
+			tmp = std::stold(d.sig, &pos);
+			int exp = d.exp;
+
+			while (exp > 0) {
+				tmp = tmp * 10.0;
+				exp--;
+			}
+
+			while (exp < 0) {
+				tmp = tmp / 10.0;
+				exp++;
+			}
+
+		} catch(std::out_of_range &e) {
+			tmp = INFINITY;
+			if (d.exp < 0) tmp = 0;
+		} catch(std::invalid_argument &e) {
+			tmp = NAN;
+		}
+
+		if (d.sgn) tmp = -tmp;
+		return tmp;
 	}
 
 } // namespace

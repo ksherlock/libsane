@@ -46,6 +46,7 @@ namespace SANE
 	void str2dec(const std::string &s, uint16_t &index, decimal &d, uint16_t &vp);
 	void dec2str(const decform &f, const decimal &d, std::string &s);
 
+	long double dec2x(const decimal &d);
 }
 
 #endif
