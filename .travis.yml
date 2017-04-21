@@ -1,5 +1,7 @@
 sudo: false
+dist: trusty
 language: generic
+os: osx
 
 before_script: 
   - mkdir build
@@ -16,13 +18,13 @@ matrix:
      - brew install ragel
  include:
   - os: linux
-    env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
+    env: COMPILER_NAME=gcc CXX=g++-4.8 CC=gcc-4.8
     addons:
      apt:
       packages:
        - ragel
        - cmake
-       - g++-5
+       - g++-4.8
 
 
 #  - brew install cmake # not needed.
