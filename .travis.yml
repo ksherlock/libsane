@@ -10,7 +10,7 @@ before_script:
   - mkdir build
   - cd build
   - cmake ..
-script: make test
+script: make ; make test
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install ragel   ; fi
@@ -19,6 +19,7 @@ addons:
  apt:
   packages:
    - ragel
+   - cmake
 
 
 #  - brew install cmake # not needed.
