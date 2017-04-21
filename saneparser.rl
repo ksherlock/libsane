@@ -229,38 +229,6 @@ void str2dec(const std::string &s, uint16_t &index, decimal &d, uint16_t &vp)
 		index = checkpoint - s.begin();
 
 		return;
-		#if 0
-
-
-		printf("%s\n", str);
-
-		bool valid = cs  != fpstr_error;
-		int index = checkpoint - str;
-
-		printf("infinity: %d\n", infinity);
-		printf("     nan: %d\n", nan);
-		printf(" nantype: %d\n", nantype);
-
-		if (negative_exp) exp = -exp;
-
-		printf("     exp: %d\n", exp);
-		printf("negative: %d\n", negative);
-		printf("     sig: %s.%s\n", siga.c_str(), sigb.c_str());
-		printf("   valid: %d\n", valid);
-		printf("   index: %d\n", index);
-		printf("\n");
-
-
-		/*
-		 * now we need to normalize the significand / exponent
-		 * 1.2 e0 -> 12 e-1
-		 * 1000 e0 -> 1 e 3
-		 */
-
-		std::string sig = normalize(siga, sigb, exp);
-
-		printf("normalized: %s e %d\n", sig.c_str(), exp);
-		#endif
 }
 
 } // namespace
