@@ -3,7 +3,7 @@
 #include "catch.hpp"
 
 #include "sane.h"
-
+#include <math.h>
 
 TEST_CASE( "Dec2Str(Float)", "[dec2str]") {
 
@@ -381,6 +381,74 @@ TEST_CASE( "Str2Dec", "[str2dec]" ) {
 		REQUIRE(d.sig == "N0015");
 		REQUIRE(d.sgn == 1);
 		REQUIRE(d.exp == 0);
+	}
+
+}
+
+
+TEST_CASE( "Dec2X", "[dec2x]" ) {
+
+	SECTION( "0" ) {
+		SANE::decimal d{ 0, 0, "0"};
+		long double dd = dec2x(d);
+		REQUIRE(dd == 0.0);
+	}
+
+	SECTION( "1" ) {
+		SANE::decimal d{ 0, 0, "1"};
+		long double dd = dec2x(d);
+		REQUIRE(dd == 1.0);
+	}
+
+
+	SECTION( "10" ) {
+		SANE::decimal d{ 0, 1, "1"};
+		long double dd = dec2x(d);
+		REQUIRE(dd == 10.0);
+	}
+
+
+	SECTION( "Infinity" ) {
+		SANE::decimal d{ 0, 0, "I"};
+		long double dd = dec2x(d);
+		REQUIRE(isinf(dd));
+		REQUIRE(signbit(dd) == 0);
+	}
+
+	SECTION( "-Infinity" ) {
+		SANE::decimal d{ 1, 0, "I"};
+		long double dd = dec2x(d);
+		REQUIRE(isinf(dd));
+		REQUIRE(signbit(dd) != 0);
+	}
+
+
+	SECTION( "NaN" ) {
+		SANE::decimal d{ 0, 0, "N0001"};
+		long double dd = dec2x(d);
+		REQUIRE(isnan(dd));
+		REQUIRE(signbit(dd) == 0);
+	}
+
+	SECTION( "-NaN" ) {
+		SANE::decimal d{ 1, 0, "N0001"};
+		long double dd = dec2x(d);
+		REQUIRE(isnan(dd));
+		REQUIRE(signbit(dd) != 0);
+	}
+
+	SECTION( "HugeVal" ) {
+		SANE::decimal d{ 0, 5000, "1"};
+		long double dd = dec2x(d);
+		REQUIRE(isinf(dd));
+		REQUIRE(signbit(dd) == 0);
+	}
+
+	SECTION( "-HugeVal" ) {
+		SANE::decimal d{ 1, 5000, "1"};
+		long double dd = dec2x(d);
+		REQUIRE(isinf(dd));
+		REQUIRE(signbit(dd) != 0);
 	}
 
 }
