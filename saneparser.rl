@@ -213,10 +213,10 @@ void str2dec(const std::string &s, uint16_t &index, decimal &d, uint16_t &vp)
 			{
 				const char *hexstr = "0123456789abcdef";
 				// 4-byte hex
-				d.sig.push_back(hexstr[(nantype >> 24) & 0xff]);
-				d.sig.push_back(hexstr[(nantype >> 16) & 0xff]);
-				d.sig.push_back(hexstr[(nantype >> 8) & 0xff]);
-				d.sig.push_back(hexstr[(nantype >> 0) & 0xff]);
+				d.sig.push_back(hexstr[(nantype >> 12) & 0x0f]);
+				d.sig.push_back(hexstr[(nantype >> 8) & 0x0f]);
+				d.sig.push_back(hexstr[(nantype >> 4) & 0x0f]);
+				d.sig.push_back(hexstr[(nantype >> 0) & 0x0f]);
 			}
 		}
 		else

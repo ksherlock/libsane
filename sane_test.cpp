@@ -360,4 +360,27 @@ TEST_CASE( "Str2Dec", "[str2dec]" ) {
 
 	}
 
+
+	SECTION( "Str2Dec('NAN(036)')" ) {
+		index = 0;
+		SANE::str2dec("NAN(036)", index, d, valid);
+		REQUIRE(index == 8);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "N0024");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('-NAN(021)')" ) {
+		index = 0;
+		SANE::str2dec("-NAN(021)", index, d, valid);
+		REQUIRE(index == 9);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "N0015");
+		REQUIRE(d.sgn == 1);
+		REQUIRE(d.exp == 0);
+	}
+
 }
