@@ -27,6 +27,10 @@
 
 #include "sane.h"
 
+#include <ctype.h>
+#include <numeric>
+#include <algorithm>
+
 
 namespace SANE {
 
@@ -47,22 +51,45 @@ namespace SANE {
 
 		int exp = d.exp;
 
+
+
+
+		if (d.sgn) s.push_back('-');
+		else if (df.style == decform::FLOATDECIMAL) s.push_back(' ');
+
+
+		// handle INF/NAN early.
+		if (sig[0] == 'I') {
+			s.append("INF");
+			return;
+		}
+		if (sig[0] == 'N') {
+			uint32_t type;
+
+			type = std::accumulate(sig.begin() + 1, sig.end(), 0, [](uint32_t akk, char c){
+				if (isdigit(c)) { akk = (akk << 4) + c - '0'; }
+				else if (isxdigit(c)) { akk = (akk << 4) + (c | 0x20) - 'a'; }
+				return akk;
+			});
+			std::string tmp;
+			tmp.reserve(3);
+			if (type > 0 && type < 1000) {
+				while (type) { 
+					tmp.push_back('0' + (type % 10));
+					type /= 10;
+				}
+				while (tmp.size() < 3) tmp.push_back('0');
+				std::reverse(tmp.begin(), tmp.end());
+			}
+			else tmp = "000";
+
+			s += "NAN(" + tmp + ")";
+			return;	
+		}
+
+
 		if (df.style == decform::FLOATDECIMAL) {
 			// [-| m[.nnn]e[+|-]dddd
-
-			// - or space.
-			if (d.sgn) s.push_back('-');
-			else s.push_back(' ');
-
-			if (sig[0] == 'I') {
-				s.append("INF");
-				return;
-			}
-			if (sig[0] == 'N') {
-				// todo -- include actual nan code.
-				s.append("NAN(000)");
-				return;	
-			}
 
 			// 1 leading digit.
 			s.push_back(sig[0]);
@@ -83,21 +110,9 @@ namespace SANE {
 		else
 		{
 			// [-] mmmm [. nnn]
-			if (d.sgn) s.push_back('-');
 
 			std::string mm;
 			std::string nn;
-
-			if (sig[0] == 'I') {
-				s.append("INF");
-				return;
-			}
-			if (sig[0] == 'N') {
-				// todo -- include actual nan code.
-				// check how SANE format it (hex/dec)
-				s.append("NAN(000)");
-				return;	
-			}
 
 			//
 			if (exp >= 0) {
