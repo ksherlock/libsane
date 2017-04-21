@@ -1,25 +1,28 @@
 sudo: false
-language: cpp
-os: 
- - osx
- - linux
-compiler:
- - clang
- - gcc
+language: generic
+
 before_script: 
   - mkdir build
   - cd build
   - cmake ..
 script: make ; make test
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install ragel   ; fi
 
-addons:
- apt:
-  packages:
-   - ragel
-   - cmake
+matrix:
+ include:
+  - os: osx
+    env: COMPILER_NAME=clang CXX=clang++ CC=clang
+    before_install:
+     - brew update
+     - brew install ragel
+ include:
+  - os: linux
+    env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
+    addons:
+     apt:
+      packages:
+       - ragel
+       - cmake
+       - g++-5
 
 
 #  - brew install cmake # not needed.
