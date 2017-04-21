@@ -1,32 +1,13 @@
-#sudo: false
-#dist: trusty
-language: generic
-os: osx
-
+language: cpp
+os: 
+ - osx
+compiler:
+ - clang
 before_script: 
   - mkdir build
   - cd build
   - cmake ..
-
-before_install:
- - brew update
- - brew install ragel
-
 script: make ; make test
-
-matrix:
- include:
-  - os: osx
-    env: COMPILER_NAME=clang CXX=clang++ CC=clang
-# include:
-#  - os: linux
-#    env: COMPILER_NAME=gcc CXX=g++-4.8 CC=gcc-4.8
-#    addons:
-#     apt:
-#      packages:
-#       - ragel
-#       - cmake
-#       - g++-4.8
-
-
-#  - brew install cmake # not needed.
+before_install:
+  - brew update
+  - brew install ragel
