@@ -452,3 +452,25 @@ TEST_CASE( "Dec2X", "[dec2x]" ) {
 	}
 
 }
+
+
+TEST_CASE( "truncation" "[truncate]") {
+
+	SECTION( "99 -> 1e2" ) {
+		SANE::decimal d { 0, 0, "99" };
+		SANE::truncate(d, 1);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == 2);
+		CHECK(d.sig == "1");
+	}
+
+	SECTION( "101 -> 1e2" ) {
+		SANE::decimal d { 0, 0, "101" };
+		SANE::truncate(d, 1);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == 2);
+		CHECK(d.sig == "1");
+	}
+
+
+}
