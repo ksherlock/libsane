@@ -12,17 +12,20 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
 add_custom_command(
-	OUTPUT saneparser.cpp
-	COMMAND ragel -p -G2 -o saneparser.cpp "${CMAKE_CURRENT_SOURCE_DIR}/saneparser.rl"
-	MAIN_DEPENDENCY saneparser.rl 
+	OUTPUT src/saneparser.cpp
+	COMMAND mkdir -p src
+	COMMAND ragel -p -G2 -o src/saneparser.cpp "${CMAKE_CURRENT_SOURCE_DIR}/src/saneparser.rl"
+	MAIN_DEPENDENCY src/saneparser.rl 
 )
 
 
 add_library(sane
-	saneparser.cpp
-	sane.cpp
+	src/saneparser.cpp
+	src/sane.cpp
+	src/fpinfo.cpp
 )
 
+target_include_directories(sane PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 
 
 ExternalProject_Add(Catch-External
@@ -37,7 +40,7 @@ ExternalProject_Add(Catch-External
 add_library(Catch INTERFACE)
 add_dependencies(Catch Catch-External)
 
-add_executable(sane_test sane_test.cpp)
+add_executable(sane_test src/sane_test.cpp)
 target_link_libraries(sane_test Catch sane)
 
 enable_testing()

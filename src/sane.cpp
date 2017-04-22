@@ -25,14 +25,17 @@
  */
 
 
-#include "sane.h"
+#include <sane/sane.h>
+#include <sane/fpinfo.h>
 
-#include <ctype.h>
-#include <math.h>
+#include <cctype>
+#include <cmath>
+#include <stdlib.h>
  
 #include <numeric>
 #include <algorithm>
 
+using std::abs;
 
 namespace SANE {
 
@@ -211,5 +214,219 @@ namespace SANE {
 		if (d.sgn) tmp = -tmp;
 		return tmp;
 	}
+
+
+	static void format_f(long double x, int precision, std::string &mm, std::string &nn)
+	{
+		char *buffer = nullptr;
+
+		mm.clear();
+		nn.clear();
+
+		if (precision < 0) precision = 0;
+		int length = asprintf(&buffer, "%.*Lf", precision, x);
+		std::string tmp(buffer, length);
+		free(buffer);
+
+		auto dot = tmp.find('.');
+		if (dot == tmp.npos)
+		{
+			mm = std::move(tmp);
+		}
+		else
+		{
+			mm = tmp.substr(0, dot);
+			nn = tmp.substr(dot + 1);
+		}
+
+		// skip mm if it's 0
+		if (mm.length() == 1 && mm.front() == '0') mm.clear();
+
+		// skip nn if it's 0000...
+		if (std::all_of(nn.begin(), nn.end(), [](char c){ return c == '0'; }))
+			nn.clear();
+	}
+
+	static void format_e(long double x, int precision, std::string &mm, std::string &nn, int16_t &exp)
+	{
+		char *buffer = nullptr;
+
+		exp = 0;
+		mm.clear();
+		nn.clear();
+
+		if (precision < 0) precision = 0;
+		if (precision > 19) precision = 19;
+
+		int length = asprintf(&buffer, "%.*Le", precision, x);
+		// output mm . nn e[+-]exp
+		// mm e[+-]exp
+		std::string tmp(buffer, length);
+		free(buffer);
+
+		auto dot = tmp.find('.');
+		auto e = tmp.find('e');
+
+		if (dot == tmp.npos)
+		{
+			mm = tmp.substr(0, e);
+		}
+		else
+		{
+			mm = tmp.substr(0, dot);
+			nn = tmp.substr(dot + 1, e - dot - 1);
+		}
+
+		char sign = tmp[e+1];
+		tmp = tmp.substr(e + 2);
+		exp = std::stoi(tmp);
+		if (sign == '-') exp = -exp;
+	}
+
+
+
+	decimal x2dec(long double x, const decform &df) {
+
+		/*
+		 * SANE pp 30, 31
+		 *
+		 * Floating style:
+		 * [-| ]m[.nnn]e[+|-]dddd
+		 *
+		 * Fixed style:
+		 * [-]mmm[.nnn]
+		 */
+
+		decimal d;
+		int digits = df.digits;
+		if (digits < 0) digits = 0;
+		if (digits > 19) digits = 19;
+
+		fpinfo fpi(x);
+		//fprintf(stderr, "%02x %02x %d %016llx\n", fpi.sign, fpi.one, fpi.exp, fpi.sig);
+
+
+		d.sgn = signbit(x);
+
+		// handle infinity, nan as a special case.
+		switch (fpclassify(x))
+		{
+			case FP_ZERO:
+				d.sig = "0";
+				return d;
+
+			case FP_NAN: {
+				// NAN type encoded in the sig.
+					char buffer[20]; // 16 + 2 needed
+					// todo -- use 4 hex digits if possible...
+					snprintf(buffer, 20, "N%016llx", fpi.sig);
+					d.sig = buffer;
+					return d;
+			}
+
+			case FP_INFINITE:
+				d.sig = "I";
+				return d;				
+
+			default:
+				break;
+
+		}
+
+		// normal and subnormal handled here....
+
+		// float decimal: df.digits refers to the total length
+		// fixed decimal: df.digits refers to the fractional part only.
+
+		x = abs(x);
+
+
+		if (x < 1.0 && df.style == decform::FLOATDECIMAL)
+		{
+			std::string mm;
+			std::string nn;
+
+			format_e(x, digits - 1, mm, nn, d.exp);
+
+			d.sig = mm + nn;
+
+			// better be < 0...
+			if (d.exp < 0)
+				d.exp -= nn.length();
+
+			return d;
+		}
+		else // x > 1
+		{
+
+			std::string mm;
+			std::string nn;
+
+			format_f(x, digits, mm, nn);
+
+			if (mm.empty() && nn.empty())
+			{
+				// very large 0.
+				d.sig = "0";
+				return d;
+			}
+
+			// if nn is empty (or 0s), this is a large number,
+			// and we don't have to worry about the fraction.
+			if (nn.empty())
+			{
+				d.exp = 0;
+
+				if (df.style == decform::FIXEDDECIMAL) digits = 19; // todo - SIGDIGITS-1?
+
+				// limit the length.
+				if (mm.length() > digits)
+				{
+					d.exp = mm.length() - digits;
+					mm.resize(digits);
+				}
+				d.sig = std::move(mm);
+
+			}
+			else
+			{
+				if (df.style == decform::FIXEDDECIMAL)
+				{
+					// digits is the total size, mm + nn
+					// re-format with new precision.
+					// this is getting repetitive...
+
+					if (mm.length())
+					{
+						int precision = digits - mm.length();
+						if (precision < 0) precision = 1;	
+
+						format_f(x, precision, mm, nn);					
+					}
+				}
+				// todo -- if mm is empty and nn has leading 0s, 
+				// drop the leading 0s and adjust the exponent
+				// accordingly.
+
+				d.sig = mm + nn;
+				d.exp = -nn.length();
+
+				if (d.sig.length() > 19)
+				{
+					d.exp += (d.sig.length() - 19);
+					d.sig.resize(19);
+				}
+			}
+
+			return d;
+		}
+	}
+
+
+
+
+
+
+
 
 } // namespace

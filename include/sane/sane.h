@@ -8,15 +8,15 @@ namespace SANE
 {
 	struct decimal {
 		enum {
-			SIGDIGLEN = 20,
+			SIGDIGLEN = 32,
 		};
 
-		int sgn = 0;
-		int exp = 0;
+		int16_t sgn = 0;
+		int16_t exp = 0;
 		std::string sig;
 
 
-		decimal(int a, int b, const std::string &c) : sgn(a), exp(b), sig(c)
+		decimal(int16_t a, int16_t b, const std::string &c) : sgn(a), exp(b), sig(c)
 		{}
 
 		decimal() = default;
@@ -31,10 +31,10 @@ namespace SANE
 			FIXEDDECIMAL = 1,
 		};
 
-		uint8_t style = 0;
+		uint16_t style = 0;
 		int16_t digits = 0;
 
-		decform(uint8_t a, int16_t b) : style(a), digits(b)
+		decform(uint16_t a, int16_t b) : style(a), digits(b)
 		{}
 
 		decform() = default;
@@ -47,6 +47,7 @@ namespace SANE
 	void dec2str(const decform &f, const decimal &d, std::string &s);
 
 	long double dec2x(const decimal &d);
+	decimal x2dec(long double x, const decform &df);
 }
 
 #endif

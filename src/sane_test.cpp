@@ -2,7 +2,7 @@
 
 #include "catch.hpp"
 
-#include "sane.h"
+#include <sane/sane.h>
 #include <math.h>
 
 TEST_CASE( "Dec2Str(Float)", "[dec2str]") {
