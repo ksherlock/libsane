@@ -48,6 +48,8 @@ namespace SANE
 
 	long double dec2x(const decimal &d);
 	decimal x2dec(long double x, const decform &df);
+
+	void truncate(decimal &d, int digits);
 }
 
 #endif

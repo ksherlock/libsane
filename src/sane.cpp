@@ -424,7 +424,41 @@ namespace SANE {
 
 
 
+	void truncate(decimal &d, int digits) {
+		if (digits < 1) digits = 1;
+		if (d.sig.length() <= digits) return;
 
+		// special case for N, I
+		if (d.sig.front() == 'I' || d.sig.front() == 'N') {
+			d.sig.resize(digits);
+			return;
+		}
+
+		bool ru = d.sig[digits] >= '5';
+		d.exp += (d.sig.length() - digits);
+		d.sig.resize(digits);
+
+		// round up...
+		while (!d.sig.empty() && ru) {
+			auto &c = d.sig.back();
+			++c;
+			ru = (c > '9');
+			if (ru) {
+				d.exp++;
+				d.sig.pop_back();
+			}
+		}
+
+		// 99 -> (1) 00.  exp already bumped.
+		if (ru && d.sig.empty()) d.sig = "1";
+
+		// remove trailing 0s.
+		while (d.sig.length() > 1 && d.sig.back() == '0') {
+			d.sig.pop_back();
+			d.exp++;
+		}
+
+	}
 
 
 
