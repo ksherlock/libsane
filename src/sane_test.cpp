@@ -451,6 +451,13 @@ TEST_CASE( "Dec2X", "[dec2x]" ) {
 		REQUIRE(signbit(dd) != 0);
 	}
 
+	// page 38 special cases.
+	SECTION( "0913") {
+		SANE::decimal d{ 0, 0, "0913"};
+		long double dd = dec2x(d);
+		REQUIRE(dd == 0.0);
+	}
+
 }
 
 

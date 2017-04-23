@@ -178,7 +178,7 @@ namespace SANE {
 
 
 	long double dec2x(const decimal &d) {
-		if (d.sig.empty()) {
+		if (d.sig.empty() || d.sig[0] == '0') {
 			return d.sgn ? -0.0 : 0.0;
 		}
 		if (d.sig[0] == 'I') {
@@ -188,6 +188,7 @@ namespace SANE {
 			// todo -- NaN type?
 			return d.sgn ? -NAN : NAN;
 		}
+
 
 		long double tmp = 0;
 		try {
