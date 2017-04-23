@@ -3,6 +3,9 @@
 #include "catch.hpp"
 
 #include <sane/sane.h>
+#include <sane/floating_point.h>
+#include <sane/complex.h>
+
 #include <cmath>
 
 using std::abs;
