@@ -22,7 +22,7 @@ add_custom_command(
 add_library(sane
 	src/saneparser.cpp
 	src/sane.cpp
-	src/fpinfo.cpp
+	src/floating_point.cpp
 )
 
 target_include_directories(sane PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/)

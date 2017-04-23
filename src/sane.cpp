@@ -26,7 +26,7 @@
 
 
 #include <sane/sane.h>
-#include <sane/fpinfo.h>
+#include <sane/floating_point.h>
 
 #include <cctype>
 #include <cmath>
@@ -36,14 +36,19 @@
 #include <algorithm>
 #include <stdexcept>
 
-using std::abs;
-using std::fpclassify;
-using std::isinf;
-using std::isnan;
-using std::signbit;
+
 
 
 namespace SANE {
+
+	namespace fp = floating_point;
+
+
+	using std::abs;
+	using std::fpclassify;
+	using std::isinf;
+	using std::isnan;
+	using std::signbit;
 
 	void dec2str(const decform &df, const decimal &d, std::string &s) {
 
@@ -309,7 +314,7 @@ namespace SANE {
 		if (digits < 0) digits = 0;
 		if (digits > 19) digits = 19;
 
-		fpinfo fpi(x);
+		fp::info fpi(x);
 		//fprintf(stderr, "%02x %02x %d %016llx\n", fpi.sign, fpi.one, fpi.exp, fpi.sig);
 
 
