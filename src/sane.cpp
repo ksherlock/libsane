@@ -34,6 +34,7 @@
  
 #include <numeric>
 #include <algorithm>
+#include <stdexcept>
 
 using std::abs;
 
