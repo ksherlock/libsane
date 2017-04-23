@@ -3,7 +3,13 @@
 #include "catch.hpp"
 
 #include <sane/sane.h>
-#include <math.h>
+#include <cmath>
+
+using std::abs;
+using std::fpclassify;
+using std::isinf;
+using std::isnan;
+using std::signbit;
 
 TEST_CASE( "Dec2Str(Float)", "[dec2str]") {
 

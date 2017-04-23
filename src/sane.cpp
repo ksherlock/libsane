@@ -37,6 +37,11 @@
 #include <stdexcept>
 
 using std::abs;
+using std::fpclassify;
+using std::isinf;
+using std::isnan;
+using std::signbit;
+
 
 namespace SANE {
 
