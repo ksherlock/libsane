@@ -13,7 +13,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_custom_command(
 	OUTPUT src/saneparser.cpp
-	COMMAND mkdir -p src
+	COMMAND ${CMAKE_COMMAND} -E make_directory src
 	COMMAND ragel -p -G2 -o src/saneparser.cpp "${CMAKE_CURRENT_SOURCE_DIR}/src/saneparser.rl"
 	MAIN_DEPENDENCY src/saneparser.rl 
 )
