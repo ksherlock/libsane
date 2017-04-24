@@ -201,7 +201,21 @@ namespace floating_point {
 		}
 
 
-
+		explicit operator long double() const {
+			long double tmp;
+			write(tmp);
+			return tmp;
+		}
+		explicit operator double() const {
+			double tmp;
+			write(tmp);
+			return tmp;
+		}
+		explicit operator float() const {
+			float tmp;
+			write(tmp);
+			return tmp;
+		}
 
 
 		template<class T, typename = std::enable_if<std::is_floating_point<T>::value> >

@@ -14,6 +14,14 @@ using std::isinf;
 using std::isnan;
 using std::signbit;
 
+using namespace SANE;
+namespace fp = SANE::floating_point;
+
+#define DOUBLE_C(v) (v)
+#define FLOAT_C(v) (v ## f)
+#define LONG_DOUBLE_C(v) (v ## l)
+
+
 TEST_CASE( "Dec2Str(Float)", "[dec2str]") {
 
 	// page 34, table 3-6
@@ -486,6 +494,74 @@ TEST_CASE( "truncation" "[truncate]") {
 		CHECK(d.sgn == 0);
 		CHECK(d.exp == 2);
 		CHECK(d.sig == "1");
+	}
+
+}
+
+TEST_CASE( "double/extended conversion", "[floating_point]") {
+
+
+	SECTION( "0.0f -> ??" ) {
+		fp::info fpi(FLOAT_C(0.0));
+		CHECK((float)fpi == FLOAT_C(0.0));
+		CHECK((double)fpi == DOUBLE_C(0.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(0.0));
+	}
+
+	SECTION( "0.0d -> ??" ) {
+		fp::info fpi(DOUBLE_C(0.0));
+		CHECK((float)fpi == FLOAT_C(0.0));
+		CHECK((double)fpi == DOUBLE_C(0.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(0.0));
+	}
+
+	SECTION( "0.0l -> ??" ) {
+		fp::info fpi(LONG_DOUBLE_C(0.0));
+		CHECK((float)fpi == FLOAT_C(0.0));
+		CHECK((double)fpi == DOUBLE_C(0.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(0.0));
+	}
+
+	SECTION( "1.0f -> ??" ) {
+		fp::info fpi(FLOAT_C(1.0));
+		CHECK((float)fpi == FLOAT_C(1.0));
+		CHECK((double)fpi == DOUBLE_C(1.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(1.0));
+	}
+
+	SECTION( "1.0d -> ??" ) {
+		fp::info fpi(DOUBLE_C(1.0));
+		CHECK((float)fpi == FLOAT_C(1.0));
+		CHECK((double)fpi == DOUBLE_C(1.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(1.0));
+	}
+
+	SECTION( "1.0l -> ??" ) {
+		fp::info fpi(LONG_DOUBLE_C(1.0));
+		CHECK((float)fpi == FLOAT_C(1.0));
+		CHECK((double)fpi == DOUBLE_C(1.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(1.0));
+	}
+
+	SECTION( "-1.0f -> ??" ) {
+		fp::info fpi(FLOAT_C(-1.0));
+		CHECK((float)fpi == FLOAT_C(-1.0));
+		CHECK((double)fpi == DOUBLE_C(-1.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(-1.0));
+	}
+
+	SECTION( "-1.0d -> ??" ) {
+		fp::info fpi(DOUBLE_C(-1.0));
+		CHECK((float)fpi == FLOAT_C(-1.0));
+		CHECK((double)fpi == DOUBLE_C(-1.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(-1.0));
+	}
+
+	SECTION( "-1.0l -> ??" ) {
+		fp::info fpi(LONG_DOUBLE_C(-1.0));
+		CHECK((float)fpi == FLOAT_C(-1.0));
+		CHECK((double)fpi == DOUBLE_C(-1.0));
+		CHECK((long double)fpi == LONG_DOUBLE_C(-1.0));
 	}
 
 

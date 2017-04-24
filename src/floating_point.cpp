@@ -13,7 +13,7 @@ namespace floating_point {
 		std::memcpy(&i, vp, 4);
 
 		sign = i >> 31;
-		one = 1;
+		one = 0;
 		exp = (i >> 23) & ((1 << 8) - 1);
 		sig = i & ((1 << 23) - 1);
 
@@ -35,7 +35,7 @@ namespace floating_point {
 			return;
 		}
 
-		if (exp) exp -= 127; // bias
+		if (exp) { one = 1; exp -= 127; } // bias
 
 		// adjust to 64 bit significand.
 		sig <<= 40;
@@ -51,10 +51,9 @@ namespace floating_point {
 		std::memcpy(&i, vp, 8);
 
 		sign = i >> 63;
-		one = 1;
+		one = 0;
 		exp = (i >> 52) & ((1 << 11) - 1);
 		sig = i & ((UINT64_C(1) << 52) - 1);
-
 
 		if (exp == 2047) {
 			exp = 0;
@@ -73,7 +72,8 @@ namespace floating_point {
 			return;
 		}
 
-		if (exp) exp -= 1023; // bias
+
+		if (exp) { one = 1; exp -= 1023; } // bias
 		sig <<= 11;
 		if (one) sig |= (UINT64_C(1) << 63);
 	}
