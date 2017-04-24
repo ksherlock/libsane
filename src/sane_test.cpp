@@ -565,4 +565,29 @@ TEST_CASE( "double/extended conversion", "[floating_point]") {
 	}
 
 
+
+	SECTION( "HUGE_VALF  -> ??" ) {
+		fp::info fpi(HUGE_VALF);
+		CHECK((float)fpi == HUGE_VALF);
+		CHECK((double)fpi == HUGE_VAL);
+		CHECK((long double)fpi == HUGE_VALL);
+	}
+
+
+	SECTION( "HUGE_VAL  -> ??" ) {
+		fp::info fpi(HUGE_VAL);
+		CHECK((float)fpi == HUGE_VALF);
+		CHECK((double)fpi == HUGE_VAL);
+		CHECK((long double)fpi == HUGE_VALL);
+	}
+
+	SECTION( "HUGE_VALL  -> ??" ) {
+		fp::info fpi(HUGE_VALL);
+		CHECK((float)fpi == HUGE_VALF);
+		CHECK((double)fpi == HUGE_VAL);
+		CHECK((long double)fpi == HUGE_VALL);
+	}
+
+
+
 }
