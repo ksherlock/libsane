@@ -591,3 +591,32 @@ TEST_CASE( "double/extended conversion", "[floating_point]") {
 
 
 }
+
+
+TEST_CASE("complex", "[complex]") {
+
+	SECTION("NAN") {
+		SANE::complex c(NAN);
+		CHECK(SANE::isnan(c));
+		c = NAN;
+		CHECK(SANE::isnan(c));
+		CHECK(SANE::fpclassify(c) == FP_NAN);
+	}
+
+	SECTION("0.0") {
+		SANE::complex c(0.0);
+		CHECK((float)c == FLOAT_C(0.0));
+		CHECK((double)c == DOUBLE_C(0.0));
+		CHECK((long double)c == LONG_DOUBLE_C(0.0));
+		CHECK(SANE::fpclassify(c) == FP_ZERO);
+	}
+
+	SECTION("1.0") {
+		SANE::complex c(1.0);
+		CHECK((float)c == FLOAT_C(1.0));
+		CHECK((double)c == DOUBLE_C(1.0));
+		CHECK((long double)c == LONG_DOUBLE_C(1.0));
+		CHECK(SANE::fpclassify(c) == FP_NORMAL);
+	}
+
+}
