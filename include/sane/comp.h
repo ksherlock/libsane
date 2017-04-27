@@ -1,26 +1,27 @@
-#ifndef __sane_complex_h__
-#define __sane_complex_h__
+#ifndef __sane_comp_h__
+#define __sane_comp_h__
 
 #include <cmath>
 #include <string>
+#include <cstdlib>
 
 	// comp is an int64_t but 0x8000_0000_0000_0000 is NaN
-	//typedef int64_t complex;
+	//typedef int64_t comp;
 
 namespace SANE {
 
-	struct complex {
+	struct comp {
 
 	public:
 		const uint64_t NaN = 0x8000000000000000;
 
-		complex(const complex &rhs) = default;
+		comp(const comp &rhs) = default;
 
-		explicit complex(uint64_t rhs) : _data(rhs)
+		explicit comp(uint64_t rhs) : _data(rhs)
 		{}
 
 		template <class T>
-		explicit complex(T t)
+		explicit comp(T t)
 		{
 			*this = t;
 		}
@@ -30,37 +31,29 @@ namespace SANE {
 			return _data == NaN;
 		}
 
-		complex &operator=(const complex &rhs) = default;
+		comp &operator=(const comp &rhs) = default;
 
-		complex &operator=(uint64_t rhs)
+		comp &operator=(uint64_t rhs)
 		{
 			_data = rhs;
 			return *this;
 		}
 
 		template <class T>
-		complex &operator=(T ld)
+		comp &operator=(T ld)
 		{
-			using std::fpclassify;
-			using std::signbit;
-
-			switch(fpclassify(ld))
+			switch(std::fpclassify(ld))
 			{
 				case FP_NAN:
+				case FP_INFINITE:
 					_data = NaN;
 					break;
-				case FP_INFINITE:
-					if (signbit(ld))
-					{
-						_data = -INT64_MAX;
-					}
-					else
-					{
-						_data = INT64_MAX;
-					}
-					break;
 				default:
-					_data = ld;
+					if (ld > INT64_MAX || ld < -INT64_MAX) {
+						_data = NaN;
+					} else {
+						_data = ld;
+					}
 					break;
 			}
 
@@ -102,47 +95,47 @@ namespace SANE {
 
 
 
-	std::string to_string(const complex &c)
+	std::string to_string(const comp &c)
 	{
 		if (c.isnan()) return std::string("nan");
 
 		return std::to_string((int64_t)c);
 	}
 
-	inline int fpclassify(const complex &c) {
+	inline int fpclassify(const comp &c) {
 		if (c.isnan()) return FP_NAN;
 		if ((uint64_t)c == (uint64_t)0) return FP_ZERO;
 		return FP_NORMAL;
 	}
 
-	inline int signbit(const complex &c) {
+	inline int signbit(const comp &c) {
 		if (c.isnan()) return 0;
 		return ((int64_t)c < (int64_t)0) ? 1 : 0;
 	}
 
-	inline int isnan(const complex &c) {
+	inline int isnan(const comp &c) {
 		return c.isnan();
 	}
 
-	inline int isinf(const complex &c) {
+	inline int isinf(const comp &c) {
 		return false;
 	}
 
-	inline int isfinite(complex c) {
+	inline int isfinite(comp c) {
 		if (c.isnan()) return false;
 		return true;
 	}
 
-	inline int isnormal(const complex &c) {
+	inline int isnormal(const comp &c) {
 		if (c.isnan()) return false;
 		if ((uint64_t)c == 0) return false;
 		return true;
 	}
 
-	inline complex abs(const complex &c) {
+	inline comp abs(const comp &c) {
 		using std::abs;
 		if (c.isnan()) return c;
-		return complex(abs((int64_t)c));
+		return comp(std::abs((int64_t)c));
 	}
 }
 

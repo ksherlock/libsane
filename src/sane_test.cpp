@@ -4,7 +4,7 @@
 
 #include <sane/sane.h>
 #include <sane/floating_point.h>
-#include <sane/complex.h>
+#include <sane/comp.h>
 
 #include <cmath>
 
@@ -593,10 +593,10 @@ TEST_CASE( "double/extended conversion", "[floating_point]") {
 }
 
 
-TEST_CASE("complex", "[complex]") {
+TEST_CASE("comp", "[comp]") {
 
 	SECTION("NAN") {
-		SANE::complex c(NAN);
+		SANE::comp c(NAN);
 		CHECK(SANE::isnan(c));
 		c = NAN;
 		CHECK(SANE::isnan(c));
@@ -604,7 +604,7 @@ TEST_CASE("complex", "[complex]") {
 	}
 
 	SECTION("0.0") {
-		SANE::complex c(0.0);
+		SANE::comp c(0.0);
 		CHECK((float)c == FLOAT_C(0.0));
 		CHECK((double)c == DOUBLE_C(0.0));
 		CHECK((long double)c == LONG_DOUBLE_C(0.0));
@@ -612,7 +612,7 @@ TEST_CASE("complex", "[complex]") {
 	}
 
 	SECTION("1.0") {
-		SANE::complex c(1.0);
+		SANE::comp c(1.0);
 		CHECK((float)c == FLOAT_C(1.0));
 		CHECK((double)c == DOUBLE_C(1.0));
 		CHECK((long double)c == LONG_DOUBLE_C(1.0));
