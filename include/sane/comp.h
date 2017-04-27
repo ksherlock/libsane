@@ -14,7 +14,7 @@ namespace SANE {
 	struct comp {
 
 	public:
-		constexpr static const uint64_t NaN = 0x8000000000000000;
+		constexpr static const uint64_t NaN = UINT64_C(0x8000000000000000);
 
 		comp(const comp &rhs) = default;
 
@@ -61,32 +61,20 @@ namespace SANE {
 		}
 
 		explicit operator long double() const {
-			if (_data == NaN)
-				return NAN;
+			if (isnan(*this)) return NAN;
 			return _data;
 		}
 
 		explicit operator double() const {
-			if (_data == NaN)
-				return NAN;
+			if (isnan(*this)) return NAN;
 			return _data;
 		}
 
 		explicit operator float() const {
-			if (_data == NaN)
-				return NAN;
+			if (isnan(*this)) return NAN;
 			return _data;
 		}
 
-		bool operator==(const comp &rhs) {
-			if (isnan(*this) || isnan(rhs)) return false;
-			return _data == rhs._data;
-		}
-
-		bool operator!=(const comp &rhs) {
-			if (isnan(*this) || isnan(rhs)) return true;
-			return _data != rhs._data;
-		}
 
 
 
@@ -119,8 +107,51 @@ namespace SANE {
 		friend int isfinite(const comp &);
 		friend int isnormal(const comp &);
 		friend comp abs(const comp &);
+
+
+		friend bool operator==(const comp &lhs, const comp &rhs);
+		friend bool operator!=(const comp &lhs, const comp &rhs);
+
+		friend bool operator<(const comp &lhs, const comp &rhs);
+		friend bool operator<=(const comp &lhs, const comp &rhs);
+		friend bool operator>(const comp &lhs, const comp &rhs);
+		friend bool operator>=(const comp &lhs, const comp &rhs);
+
 	};
 
+
+
+	/* comparison operators */
+
+	inline bool operator==(const comp &lhs, const comp &rhs) {
+		if (isnan(lhs) || isnan(rhs)) return false;
+		return lhs._data == rhs._data;
+	}
+
+	inline bool operator!=(const comp &lhs, const comp &rhs) {
+		if (isnan(lhs) || isnan(rhs)) return false;
+		return lhs._data != rhs._data;
+	}
+
+	inline bool operator<(const comp &lhs, const comp &rhs) {
+		if (isnan(lhs) || isnan(rhs)) return false;
+		return lhs._data < rhs._data;
+	}
+
+	inline bool operator<=(const comp &lhs, const comp &rhs) {
+		if (isnan(lhs) || isnan(rhs)) return false;
+		return lhs._data <= rhs._data;
+	}
+
+	inline bool operator>(const comp &lhs, const comp &rhs) {
+		if (isnan(lhs) || isnan(rhs)) return false;
+		return lhs._data > rhs._data;
+	}
+
+	inline bool operator>=(const comp &lhs, const comp &rhs) {
+		if (isnan(lhs) || isnan(rhs)) return false;
+		return lhs._data >= rhs._data;
+	}
 
 
 	std::string to_string(const comp &c) {
@@ -141,7 +172,7 @@ namespace SANE {
 	}
 
 	inline int isnan(const comp &c) {
-		return c._data == comp::NaN;
+		return (uint64_t)c._data == comp::NaN;
 	}
 
 	inline int isinf(const comp &c) {
