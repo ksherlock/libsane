@@ -30,13 +30,49 @@
 
 #include <cctype>
 #include <cmath>
+#include <cstdio>
 #include <stdlib.h>
  
 #include <numeric>
 #include <algorithm>
 #include <stdexcept>
 
+#include "sane_config.h"
 
+#ifndef HAVE_ASPRINTF
+
+#include <cstdarg>
+
+namespace {
+
+	int vasprintf(char **out, const char *fmt, va_list ap) {
+		int size;
+		char *cp;
+
+		size = vsnprintf(NULL, 0, fmt, ap);
+		if (size < 0) return size;
+		cp = (char *)malloc(size + 1);
+		*out = cp;
+
+		if (!cp) return -1;
+
+		return vsnprintf(cp, size, fmt, ap);
+	}
+
+	int asprintf(char **out, const char *fmt, ...) {
+		int size;
+		va_list ap;
+		va_start(ap, fmt);
+
+		size = vasprintf(out, fmt, ap);
+		va_end(ap);
+		return size;
+	}
+
+}
+
+
+#endif
 
 
 namespace SANE {

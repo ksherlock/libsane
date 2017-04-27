@@ -8,6 +8,9 @@ set(CMAKE_CXX_EXTENSIONS FALSE)
 
 include(ExternalProject)
 
+include(sane_config.cmake)
+
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
