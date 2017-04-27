@@ -31,7 +31,7 @@
 #include <cctype>
 #include <cmath>
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
  
 #include <numeric>
 #include <algorithm>
