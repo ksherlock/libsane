@@ -6,6 +6,24 @@
 
 namespace SANE
 {
+
+	/* NaN codes.  See pp41, table 5-1 */
+	enum {
+		NANSQRT = 1,       /* Invalid square root, such as sqrt(-1)   */
+		NANADD = 2,        /* Invalid addition, such as +INF - +INF   */
+		NANDIV = 4,        /* Invalid division, such as 0/0           */
+		NANMUL = 8,        /* Invalid multiply, such as 0 * INF       */
+		NANREM = 9,        /* Invalid rem or mod, such as x REM 0     */
+		NANASCBIN = 17,    /* Conversion of invalid ASCII string     */
+		NANCOMP = 20,      /* Comp NaN converted to floating         */
+		NANZERO = 21,      /* Attempt to create a NaN with zero code */
+		NANTRIG = 33,      /* Invalid argument to trig routine       */
+		NANINVTRIG = 34,   /* Invalid arg to inverse trig routine    */
+		NANLOG = 36,       /* Invalid argument to log routine        */
+		NANPOWER = 37,     /* Invalid argument to x^i or x^y routine */
+		NANFINAN = 38,     /* Invalid argument to financial function */	
+	};
+
 	struct decimal {
 		enum {
 			SIGDIGLEN = 32,
