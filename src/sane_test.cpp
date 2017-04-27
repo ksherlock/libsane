@@ -598,8 +598,6 @@ TEST_CASE("comp", "[comp]") {
 	SECTION("NAN") {
 		SANE::comp c(NAN);
 		CHECK(SANE::isnan(c));
-		c = NAN;
-		CHECK(SANE::isnan(c));
 		CHECK(SANE::fpclassify(c) == FP_NAN);
 	}
 
@@ -617,6 +615,18 @@ TEST_CASE("comp", "[comp]") {
 		CHECK((double)c == DOUBLE_C(1.0));
 		CHECK((long double)c == LONG_DOUBLE_C(1.0));
 		CHECK(SANE::fpclassify(c) == FP_NORMAL);
+	}
+
+	SECTION("HUGE_VAL") {
+		SANE::comp c(HUGE_VAL);
+		CHECK(SANE::isnan(c));
+		CHECK(SANE::fpclassify(c) == FP_NAN);
+	}
+
+
+	SECTION("abs") {
+		SANE::comp c(-123);
+		CHECK(SANE::abs(c) == SANE::comp(123));
 	}
 
 }
