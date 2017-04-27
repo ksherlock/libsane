@@ -34,12 +34,14 @@ namespace SANE
 		std::string sig;
 
 
-		decimal(int16_t a, int16_t b, const std::string &c) : sgn(a), exp(b), sig(c)
+		decimal(int16_t a, int16_t b, const std::string &c) : sgn(a ? 1 : 0), exp(b), sig(c)
 		{}
 
 		decimal() = default;
 		decimal(const decimal &) = default;
 		decimal(decimal &&) = default;
+
+		decimal &operator=(const decimal &) = default;
 
 	};
 
@@ -52,12 +54,15 @@ namespace SANE
 		uint16_t style = 0;
 		int16_t digits = 0;
 
-		decform(uint16_t a, int16_t b) : style(a), digits(b)
+		decform(uint16_t a, int16_t b) : style(a ? 1 : 0), digits(b)
 		{}
 
 		decform() = default;
 		decform(const decform &) = default;
 		decform(decform &&) = default;
+
+		decform &operator=(const decform &) = default;
+
 	};
 
 
