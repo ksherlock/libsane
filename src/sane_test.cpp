@@ -630,3 +630,31 @@ TEST_CASE("comp", "[comp]") {
 	}
 
 }
+
+
+TEST_CASE("make_nan", "[nan]") {
+
+	SECTION("make_nan<float>") {
+		CHECK(std::isnan(make_nan<float>(0)));
+	}
+
+	SECTION("make_nan<double>") {
+		CHECK(std::isnan(make_nan<double>(0)));
+	}
+
+	SECTION("make_nan<long double>") {
+		CHECK(std::isnan(make_nan<long double>(0)));
+	}
+
+	SECTION("make_nan<comp>") {
+		CHECK(SANE::isnan(make_nan<SANE::comp>(0)));
+	}
+
+	SECTION("make_nan<decimal>") {
+		SANE::decimal d = make_nan<SANE::decimal>(0xff);
+		CHECK(d.sig == "N00ff");
+	}
+
+
+
+}

@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstring>
 #include <utility>
+#include <string>
 
 #include "endian.h"
 
@@ -267,7 +268,7 @@ namespace floating_point {
 		return tmp;
 	}
 
-	//std::string to_string(const floating_point::info &fpi);
+	std::string to_string(const floating_point::info &fpi);
 
 }
 

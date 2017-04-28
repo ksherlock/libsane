@@ -509,6 +509,23 @@ namespace SANE {
 
 	}
 
+
+	int fpclassify(const decimal &d) {
+		if (d.sig.empty() || d.sig.front() == '0') return FP_ZERO;
+		if (d.sig.front() == 'N') return FP_NAN;
+		if (d.sig.front() == 'I') return FP_INFINITE;
+		return FP_NORMAL;
+	}
+
+	inline int isfinite(const decimal &d) {
+		return d.sig.empty() || std::isdigit(d.sig.front());
+	}
+
+	inline int isnormal(const decimal &d) {
+		if (d.sig.empty() || d.sig.front() == '0') return false;
+		return std::isdigit(d.sig.front());
+	}
+
 	std::string to_string(const comp &c) {
 
 		if (isnan(c)) return std::string("nan");

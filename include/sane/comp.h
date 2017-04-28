@@ -175,7 +175,7 @@ namespace SANE {
 		return false;
 	}
 
-	inline int isfinite(comp c) {
+	inline int isfinite(const comp &c) {
 		if (isnan(c)) return false;
 		return true;
 	}

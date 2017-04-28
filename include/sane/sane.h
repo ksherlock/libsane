@@ -65,6 +65,36 @@ namespace SANE
 
 	};
 
+	std::string to_string(const decimal &d);
+
+	int fpclassify(const decimal &d);
+	int isfinite(const decimal &d);
+	int isnormal(const decimal &d);
+
+	inline int isnan(const decimal &d) {
+		return !d.sig.empty() && d.sig.front() == 'N';
+	}
+
+
+	inline int signbit(const decimal &d) {
+		if (isnan(d)) return 0;
+		return d.sgn;
+	}
+
+
+
+	inline int isinf(const decimal &d) {
+		return !d.sig.empty() && d.sig.front() == 'I';
+	}
+
+
+	inline decimal abs(const decimal &d) {
+		decimal tmp(d);
+		tmp.sgn = 0;
+		return tmp;
+	}
+
+
 
 	void str2dec(const std::string &s, uint16_t &index, decimal &d, uint16_t &vp);
 	void dec2str(const decform &f, const decimal &d, std::string &s);
