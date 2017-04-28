@@ -231,11 +231,7 @@ namespace floating_point {
 
 } // floating point.
 
-/*
-	std::string to_string(const info &fpi)
-	{
-	}
-*/
+
 	inline int fpclassify(const floating_point::info &fpi) {
 		if (fpi.nan) return FP_NAN;
 		if (fpi.inf) return FP_INFINITE;
@@ -270,6 +266,8 @@ namespace floating_point {
 		tmp.sign = 0;
 		return tmp;
 	}
+
+	//std::string to_string(const floating_point::info &fpi);
 
 }
 

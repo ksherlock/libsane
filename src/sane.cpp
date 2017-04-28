@@ -27,6 +27,7 @@
 
 #include <sane/sane.h>
 #include <sane/floating_point.h>
+#include <sane/comp.h>
 
 #include <cctype>
 #include <cmath>
@@ -508,7 +509,63 @@ namespace SANE {
 
 	}
 
+	std::string to_string(const comp &c) {
+
+		if (isnan(c)) return std::string("nan");
+		return std::to_string((int64_t)c);
+	}
 
 
+	template<>
+	comp make_nan<comp>(unsigned code) {
+		return comp(UINT64_C(0x8000000000000000));
+	}
+	template<>
+	decimal make_nan<decimal>(unsigned code) {
+		std::string s = "N";
+		code = code & 0xffff;
+		if (code) {
+
+			const char *hexstr = "0123456789abcdef";
+			// 4-byte hex
+			s.push_back(hexstr[(code >> 12) & 0x0f]);
+			s.push_back(hexstr[(code >> 8) & 0x0f]);
+			s.push_back(hexstr[(code >> 4) & 0x0f]);
+			s.push_back(hexstr[(code >> 0) & 0x0f]);
+
+		}
+		decimal d{ 0, 0, s};
+		return d;
+	}
+
+	template<>
+	float make_nan<float>(unsigned code) {
+		if (!code) code = NANZERO;
+
+		floating_point::info i;
+		i.nan = true;
+		i.sig = code;
+		return (float)i;
+	}
+
+	template<>
+	double make_nan<double>(unsigned code) {
+		if (!code) code = NANZERO;
+
+		floating_point::info i;
+		i.nan = true;
+		i.sig = code;
+		return (double)i;
+	}
+
+	template<>
+	long double make_nan<long double>(unsigned code) {
+		if (!code) code = NANZERO;
+
+		floating_point::info i;
+		i.nan = true;
+		i.sig = code;
+		return (long double)i;
+	}
 
 } // namespace

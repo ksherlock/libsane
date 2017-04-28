@@ -154,11 +154,7 @@ namespace SANE {
 	}
 
 
-	std::string to_string(const comp &c) {
-
-		if (isnan(c)) return std::string("nan");
-		return std::to_string((int64_t)c);
-	}
+	std::string to_string(const comp &c);
 
 	inline int fpclassify(const comp &c) {
 		if (isnan(c)) return FP_NAN;

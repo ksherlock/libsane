@@ -73,6 +73,9 @@ namespace SANE
 	decimal x2dec(long double x, const decform &df);
 
 	void truncate(decimal &d, int digits);
+
+	template<class T>
+	T make_nan(unsigned code);
 }
 
 #endif
