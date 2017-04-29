@@ -57,7 +57,7 @@ namespace {
 
 		if (!cp) return -1;
 
-		return vsnprintf(cp, size, fmt, ap);
+		return vsnprintf(cp, size+1, fmt, ap);
 	}
 
 	int asprintf(char **out, const char *fmt, ...) {
