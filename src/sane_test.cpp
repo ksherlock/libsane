@@ -635,15 +635,21 @@ TEST_CASE("comp", "[comp]") {
 TEST_CASE("make_nan", "[nan]") {
 
 	SECTION("make_nan<float>") {
-		CHECK(std::isnan(make_nan<float>(0)));
+		auto tmp = make_nan<float>(1);
+		CHECK(std::isnan(tmp));
+		CHECK(SANE::floating_point::info(tmp).sig == 1);
 	}
 
 	SECTION("make_nan<double>") {
-		CHECK(std::isnan(make_nan<double>(0)));
+		auto tmp = make_nan<double>(1);
+		CHECK(std::isnan(tmp));
+		CHECK(SANE::floating_point::info(tmp).sig == 1);
 	}
 
 	SECTION("make_nan<long double>") {
-		CHECK(std::isnan(make_nan<long double>(0)));
+		auto tmp = make_nan<long double>(1);
+		CHECK(std::isnan(tmp));
+		CHECK(SANE::floating_point::info(tmp).sig == 1);
 	}
 
 	SECTION("make_nan<comp>") {
@@ -655,6 +661,17 @@ TEST_CASE("make_nan", "[nan]") {
 		CHECK(d.sig == "N00ff");
 	}
 
+}
 
 
+TEST_CASE("x2dec", "[x2dec]") {
+	// page 33.
+
+	SANE::decform df{SANE::decform::FIXEDDECIMAL, 0};
+	SANE::decimal d = SANE::x2dec(120, df);
+	d.exp -= 2; // divide by 100
+	df.digits = 2;
+	std::string s;
+	dec2str(df, d, s);
+	CHECK(s == "1.20");
 }

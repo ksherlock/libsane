@@ -106,6 +106,12 @@ namespace SANE
 
 	template<class T>
 	T make_nan(unsigned code);
+
+
+	template<> float make_nan<float>(unsigned);
+	template<> double make_nan<double>(unsigned);
+	template<> long double make_nan<long double>(unsigned);
+	template<> decimal make_nan<decimal>(unsigned);
 }
 
 #endif

@@ -87,6 +87,77 @@ namespace SANE {
 	using std::isnan;
 	using std::signbit;
 
+
+	namespace {
+		// Nxxxx -> int. 0 if empty.
+		unsigned nan_type(const std::string &s) {
+
+			return std::accumulate(s.begin() + 1, s.end(), 0, [](uint32_t akk, char c){
+				if (std::isdigit(c)) { akk = (akk << 4) + c - '0'; }
+				else if (std::isxdigit(c)) { akk = (akk << 4) + (c | 0x20) - 'a'; }
+				return akk;
+			});
+
+		}
+	}
+
+
+	template<>
+	comp make_nan<comp>(unsigned code) {
+		return comp(UINT64_C(0x8000000000000000));
+	}
+
+	template<>
+	decimal make_nan<decimal>(unsigned code) {
+		std::string s = "N";
+		code = code & 0xffff;
+		if (code) {
+
+			const char *hexstr = "0123456789abcdef";
+			// 4-byte hex
+			s.push_back(hexstr[(code >> 12) & 0x0f]);
+			s.push_back(hexstr[(code >> 8) & 0x0f]);
+			s.push_back(hexstr[(code >> 4) & 0x0f]);
+			s.push_back(hexstr[(code >> 0) & 0x0f]);
+
+		}
+		decimal d{ 0, 0, s};
+		return d;
+	}
+
+	template<>
+	float make_nan<float>(unsigned code) {
+		if (!code) code = NANZERO;
+
+		floating_point::info i;
+		i.nan = true;
+		i.sig = code;
+		return (float)i;
+	}
+
+	template<>
+	double make_nan<double>(unsigned code) {
+		if (!code) code = NANZERO;
+
+		floating_point::info i;
+		i.nan = true;
+		i.sig = code;
+		return (double)i;
+	}
+
+	template<>
+	long double make_nan<long double>(unsigned code) {
+		if (!code) code = NANZERO;
+
+		floating_point::info i;
+		i.nan = true;
+		i.sig = code;
+		return (long double)i;
+	}
+
+
+
+
 	void dec2str(const decform &df, const decimal &d, std::string &s) {
 
 		s.clear();
@@ -117,13 +188,7 @@ namespace SANE {
 			return;
 		}
 		if (sig[0] == 'N') {
-			uint32_t type;
-
-			type = std::accumulate(sig.begin() + 1, sig.end(), 0, [](uint32_t akk, char c){
-				if (isdigit(c)) { akk = (akk << 4) + c - '0'; }
-				else if (isxdigit(c)) { akk = (akk << 4) + (c | 0x20) - 'a'; }
-				return akk;
-			});
+			unsigned type = nan_type(sig);
 			std::string tmp;
 			tmp.reserve(3);
 			if (type > 0 && type < 1000) {
@@ -225,6 +290,8 @@ namespace SANE {
 
 
 	long double dec2x(const decimal &d) {
+		// todo -- if sig is empty, NAN or 0?
+
 		if (d.sig.empty() || d.sig[0] == '0') {
 			return d.sgn ? -0.0 : 0.0;
 		}
@@ -233,7 +300,8 @@ namespace SANE {
 		}
 		if (d.sig[0] == 'N') {
 			// todo -- NaN type?
-			return d.sgn ? -NAN : NAN;
+			long double tmp = make_nan<long double>(nan_type(d.sig));
+			return d.sgn ? -tmp : tmp;
 		}
 
 
@@ -241,6 +309,8 @@ namespace SANE {
 		try {
 			size_t pos;
 			tmp = std::stold(d.sig, &pos);
+			if (pos != d.sig.length()) throw std::invalid_argument("");
+
 			int exp = d.exp;
 
 			while (exp > 0) {
@@ -257,7 +327,7 @@ namespace SANE {
 			tmp = INFINITY;
 			if (d.exp < 0) tmp = 0;
 		} catch(std::invalid_argument &e) {
-			tmp = NAN;
+			tmp = make_nan<long double>(NANASCBIN);
 		}
 
 		if (d.sgn) tmp = -tmp;
@@ -368,7 +438,7 @@ namespace SANE {
 				// NAN type encoded in the sig.
 					char buffer[20]; // 16 + 2 needed
 					// todo -- use 4 hex digits if possible...
-					snprintf(buffer, 20, "N%016llx", fpi.sig);
+					snprintf(buffer, sizeof(buffer), "N%04x", (unsigned)fpi.sig & 0xffff);
 					d.sig = buffer;
 					return d;
 			}
@@ -532,57 +602,5 @@ namespace SANE {
 		return std::to_string((int64_t)c);
 	}
 
-
-	template<>
-	comp make_nan<comp>(unsigned code) {
-		return comp(UINT64_C(0x8000000000000000));
-	}
-	template<>
-	decimal make_nan<decimal>(unsigned code) {
-		std::string s = "N";
-		code = code & 0xffff;
-		if (code) {
-
-			const char *hexstr = "0123456789abcdef";
-			// 4-byte hex
-			s.push_back(hexstr[(code >> 12) & 0x0f]);
-			s.push_back(hexstr[(code >> 8) & 0x0f]);
-			s.push_back(hexstr[(code >> 4) & 0x0f]);
-			s.push_back(hexstr[(code >> 0) & 0x0f]);
-
-		}
-		decimal d{ 0, 0, s};
-		return d;
-	}
-
-	template<>
-	float make_nan<float>(unsigned code) {
-		if (!code) code = NANZERO;
-
-		floating_point::info i;
-		i.nan = true;
-		i.sig = code;
-		return (float)i;
-	}
-
-	template<>
-	double make_nan<double>(unsigned code) {
-		if (!code) code = NANZERO;
-
-		floating_point::info i;
-		i.nan = true;
-		i.sig = code;
-		return (double)i;
-	}
-
-	template<>
-	long double make_nan<long double>(unsigned code) {
-		if (!code) code = NANZERO;
-
-		floating_point::info i;
-		i.nan = true;
-		i.sig = code;
-		return (long double)i;
-	}
 
 } // namespace

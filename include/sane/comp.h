@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <cstdint>
 
+#include "sane.h"
+
 	// comp is an int64_t but 0x8000_0000_0000_0000 is NaN
 	//typedef int64_t comp;
 
@@ -61,17 +63,17 @@ namespace SANE {
 		}
 
 		explicit operator long double() const {
-			if (isnan(*this)) return NAN;
+			if (isnan(*this)) return make_nan<long double>(NANCOMP);
 			return _data;
 		}
 
 		explicit operator double() const {
-			if (isnan(*this)) return NAN;
+			if (isnan(*this)) return make_nan<double>(NANCOMP);
 			return _data;
 		}
 
 		explicit operator float() const {
-			if (isnan(*this)) return NAN;
+			if (isnan(*this)) return make_nan<float>(NANCOMP);
 			return _data;
 		}
 
@@ -190,6 +192,10 @@ namespace SANE {
 		if (isnan(c)) return c;
 		return comp(std::abs((int64_t)c));
 	}
+
+	template<> comp make_nan<comp>(unsigned);
+
+
 }
 
 #endif
