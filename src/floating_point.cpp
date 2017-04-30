@@ -9,6 +9,8 @@ namespace floating_point {
 
 	void info::read_single(const void *vp) {
 
+		using namespace single_traits;
+
 		uint32_t i;
 		std::memcpy(&i, vp, 4);
 
@@ -35,7 +37,7 @@ namespace floating_point {
 			return;
 		}
 
-		if (exp) { one = 1; exp -= 127; } // bias
+		if (exp) { one = 1; exp -= bias; }
 
 		// adjust to 64 bit significand.
 		sig <<= 40;
@@ -46,6 +48,8 @@ namespace floating_point {
 
 
 	void info::read_double(const void *vp) {
+
+		using namespace double_traits;
 
 		uint64_t i;
 		std::memcpy(&i, vp, 8);
@@ -73,13 +77,15 @@ namespace floating_point {
 		}
 
 
-		if (exp) { one = 1; exp -= 1023; } // bias
+		if (exp) { one = 1; exp -= bias; }
 		sig <<= 11;
 		if (one) sig |= (UINT64_C(1) << 63);
 	}
 
 
 	void info::read_extended(const void *vp) {
+
+		using namespace extended_traits;
 
 		uint64_t i;
 		uint16_t sexp;
@@ -118,7 +124,7 @@ namespace floating_point {
 	#endif
 		// 
 
-		if (exp) exp -= 16383;
+		if (exp) exp -= bias;
 	}
 
 

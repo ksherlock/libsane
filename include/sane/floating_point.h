@@ -41,12 +41,27 @@ namespace floating_point {
 	};
 #endif
 
+	namespace half_traits {
+		constexpr size_t bias = 15;
+		constexpr size_t exponent_bits = 5;
+		constexpr size_t significand_bits = 10;
+		constexpr int max_exp = 15;
+		constexpr int min_exp = -14;
+
+		constexpr uint16_t significand_mask = ((1 << significand_bits) - 1);
+		constexpr uint16_t sign_bit = UINT16_C(1) << 15;
+		constexpr uint16_t nan_exp = UINT16_C(31) << significand_bits;
+
+		constexpr uint16_t quiet_nan = UINT16_C(0x02) << (significand_bits - 2);
+		constexpr uint16_t signaling_nan = UINT16_C(0x01) << (significand_bits - 2);
+	}
+
 	namespace single_traits {
 		constexpr size_t bias = 127;
 		constexpr size_t exponent_bits = 8;
 		constexpr size_t significand_bits = 23;
 		constexpr int max_exp = 127;
-		constexpr int min_exp = -127;
+		constexpr int min_exp = -126;
 
 		constexpr uint32_t significand_mask = ((1 << significand_bits) - 1);
 		constexpr uint32_t sign_bit = UINT32_C(1) << 31;
@@ -61,7 +76,7 @@ namespace floating_point {
 		constexpr size_t exponent_bits = 11;
 		constexpr size_t significand_bits = 52;
 		constexpr int max_exp = 1023;
-		constexpr int min_exp = -1023;
+		constexpr int min_exp = -1022;
 
 		constexpr uint64_t significand_mask = ((UINT64_C(1) << significand_bits) - 1);
 		constexpr uint64_t sign_bit = UINT64_C(1) << 63;
@@ -77,7 +92,7 @@ namespace floating_point {
 		constexpr size_t exponent_bits = 15;
 		constexpr size_t significand_bits = 63; // does not include explicit 1.
 		constexpr int max_exp = 16383;
-		constexpr int min_exp = -16383;
+		constexpr int min_exp = -16382;
 
 		constexpr uint64_t significand_mask = ((UINT64_C(1) << significand_bits) - 1);
 
