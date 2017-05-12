@@ -116,6 +116,7 @@ std::string normalize(std::string &a, std::string &b, int &exponent)
 	// 1.1 = 11e-1
 	// 0.1 = 1e-1
 
+	// Sane816 doesn't do this but logic below depends on it.
 	// remove trailing 0s
 	while (b.size() && b.back() == '0')
 		b.pop_back();
@@ -134,8 +135,7 @@ std::string normalize(std::string &a, std::string &b, int &exponent)
 	case 0x01:
 		// a only.
 		// remove trailing 0s and add 1 exp for each.
-		while (a.length() && a.back() == '0')
-		{
+		while (a.length() && a.back() == '0') {
 			a.pop_back();
 			exponent++;
 		}
@@ -221,8 +221,9 @@ void str2dec(const std::string &s, uint16_t &index, decimal &d, uint16_t &vp)
 		}
 		else
 		{
+			if (negative_exp) exp = -exp;
 			d.sig = normalize(siga, sigb, exp);
-			d.exp = negative_exp ? -exp : exp;
+			d.exp = exp;
 		}
 
 		vp = cs != fpstr_error;
