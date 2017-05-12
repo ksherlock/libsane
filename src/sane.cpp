@@ -276,8 +276,15 @@ namespace SANE {
 				// for a pathological case like -32768, this would
 				// be silly.
 
-				if (exp < 0)
-					nn.append(-exp, '0');
+				// 500 e-3 == .5
+				// 5 e-1 = .5
+				// 5 e-2 = .05
+
+				if (exp < 0) {
+					long tmp = -(sig.length() + exp);
+					if (tmp > 0)
+						nn.append(tmp, '0');
+				}
 				nn.append(sig);
 				nn.resize(digits, '0'); // todo -- should round...
 				s.append(nn);

@@ -133,6 +133,7 @@ TEST_CASE( "Dec2Str(Float)", "[dec2str]") {
 		REQUIRE(s == "-INF");
 	}
 
+
 }
 
 TEST_CASE( "Dec2Str(Fixed)", "[dec2str]") {
@@ -269,6 +270,50 @@ TEST_CASE( "Dec2Str(Fixed)", "[dec2str]") {
 		dec2str(df, d, s);
 		REQUIRE(s == "-INF");
 	}
+
+
+	/* used by IIgs printf("%f", .5) */
+	SECTION( ".5" ) {
+		SANE::decimal d{ 0, -6, "500000" };
+		SANE::decform df{ SANE::decform::FIXEDDECIMAL, 6};
+
+		dec2str(df, d, s);
+		REQUIRE(s == "0.500000");
+	}
+
+	SECTION( ".05" ) {
+		SANE::decimal d{ 0, -7, "500000" };
+		SANE::decform df{ SANE::decform::FIXEDDECIMAL, 6};
+
+		dec2str(df, d, s);
+		REQUIRE(s == "0.050000");
+	}
+
+	SECTION( ".5" ) {
+		SANE::decimal d{ 0, -1, "5" };
+		SANE::decform df{ SANE::decform::FIXEDDECIMAL, 6};
+
+		dec2str(df, d, s);
+		REQUIRE(s == "0.500000");
+	}
+
+	SECTION( ".05" ) {
+		SANE::decimal d{ 0, -2, "5" };
+		SANE::decform df{ SANE::decform::FIXEDDECIMAL, 6};
+
+		dec2str(df, d, s);
+		REQUIRE(s == "0.050000");
+	}
+
+	SECTION( "5" ) {
+		SANE::decimal d{ 0, 0, "5" };
+		SANE::decform df{ SANE::decform::FIXEDDECIMAL, 6};
+
+		dec2str(df, d, s);
+		REQUIRE(s == "5.000000");
+	}
+
+
 
 }
 
