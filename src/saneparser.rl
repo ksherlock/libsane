@@ -26,6 +26,7 @@
 
 #include <sane/sane.h>
 #include <string>
+#include <algorithm>
 
 namespace SANE {
 
@@ -118,8 +119,15 @@ std::string normalize(std::string &a, std::string &b, int &exponent)
 
 	// Sane816 doesn't do this but logic below depends on it.
 	// remove trailing 0s
+	#if 0
 	while (b.size() && b.back() == '0')
 		b.pop_back();
+	#else
+	if (std::all_of(b.begin(), b.end(), [](char c){ return c == '0'; }))
+		b.clear();
+
+	#endif
+
 
 	int bits = 0;
 	if (a.length()) bits |= 0x01;
@@ -129,16 +137,17 @@ std::string normalize(std::string &a, std::string &b, int &exponent)
 	switch(bits)
 	{
 	case 0x00:
-		// should never happen...
 		break;
 
 	case 0x01:
 		// a only.
 		// remove trailing 0s and add 1 exp for each.
+		#if 0
 		while (a.length() && a.back() == '0') {
 			a.pop_back();
 			exponent++;
 		}
+		#endif
 		out = a;
 		break;
 

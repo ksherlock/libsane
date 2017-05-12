@@ -445,6 +445,114 @@ TEST_CASE( "Str2Dec", "[str2dec]" ) {
 		REQUIRE(d.exp == 0);
 	}
 
+	// previous bugs
+	SECTION( "Str2Dec('100e-5')") {
+		index = 0;
+		SANE::str2dec("100e-5", index, d, valid);
+		REQUIRE(index == 6);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "100");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == -5);
+	}
+
+	SECTION( "Str2Dec('100e5')") {
+		index = 0;
+		SANE::str2dec("100e5", index, d, valid);
+		REQUIRE(index == 5);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "100");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 5);
+	}
+
+
+	SECTION( "Str2Dec('00100e-5')") {
+		index = 0;
+		SANE::str2dec("00100e-5", index, d, valid);
+		REQUIRE(index == 8);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "100");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == -5);
+	}
+
+	SECTION( "Str2Dec('00100e5')") {
+		index = 0;
+		SANE::str2dec("00100e5", index, d, valid);
+		REQUIRE(index == 7);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "100");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 5);
+	}
+
+
+	SECTION( "Str2Dec('.100e5')") {
+		index = 0;
+		SANE::str2dec(".100e5", index, d, valid);
+		REQUIRE(index == 6);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "100");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 2);
+	}
+
+	SECTION( "Str2Dec('.100e-5')") {
+		index = 0;
+		SANE::str2dec(".100e-5", index, d, valid);
+		REQUIRE(index == 7);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "100");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == -8);
+	}
+
+
+	SECTION( "Str2Dec('.00100e5')") {
+		index = 0;
+		SANE::str2dec(".00100e5", index, d, valid);
+		REQUIRE(index == 8);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "100");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('.00100e-5')") {
+		index = 0;
+		SANE::str2dec(".00100e-5", index, d, valid);
+		REQUIRE(index == 9);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "100");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == -10);
+	}
+
+
+
+
+	SECTION( "Str2Dec('.00')") {
+		index = 0;
+		SANE::str2dec(".00", index, d, valid);
+		REQUIRE(index == 3);
+		REQUIRE(valid);
+
+		REQUIRE(d.sig == "0");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+
+
 }
 
 
