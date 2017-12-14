@@ -828,3 +828,39 @@ TEST_CASE("x2dec", "[x2dec]") {
 	dec2str(df, d, s);
 	CHECK(s == "1.20");
 }
+
+
+TEST_CASE("x2dec .0625", "[x2dec]") {
+	// https://github.com/ksherlock/mpw/issues/32
+
+	SANE::decform df{SANE::decform::FIXEDDECIMAL, 6};
+	SANE::decimal d = SANE::x2dec(1.0 / 16.0, df);
+
+	CHECK(d.sgn == 0);
+	CHECK(d.exp == -6);
+	CHECK(d.sig == "62500");
+	// was { sgn = 0, exp = -6, sig = "062500" }
+
+}
+
+
+TEST_CASE("x2dec 1.0625", "[x2dec]") {
+
+	SANE::decform df{SANE::decform::FIXEDDECIMAL, 6};
+	SANE::decimal d = SANE::x2dec(1.0625, df);
+
+	CHECK(d.sgn == 0);
+	CHECK(d.exp == -6);
+	CHECK(d.sig == "1062500");
+}
+
+
+TEST_CASE("x2dec 1.125", "[x2dec]") {
+
+	SANE::decform df{SANE::decform::FIXEDDECIMAL, 6};
+	SANE::decimal d = SANE::x2dec(1.125, df);
+
+	CHECK(d.sgn == 0);
+	CHECK(d.exp == -6);
+	CHECK(d.sig == "1125000");
+}

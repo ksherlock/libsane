@@ -512,36 +512,45 @@ namespace SANE {
 					mm.resize(digits);
 				}
 				d.sig = std::move(mm);
-
+				return d;
 			}
-			else
+
+			if (df.style == decform::FIXEDDECIMAL)
 			{
-				if (df.style == decform::FIXEDDECIMAL)
+				// digits is the total size, mm + nn
+				// re-format with new precision.
+				// this is getting repetitive...
+
+				if (mm.length())
 				{
-					// digits is the total size, mm + nn
-					// re-format with new precision.
-					// this is getting repetitive...
+					int precision = digits; // - mm.length();
+					if (precision < 0) precision = 1;	
 
-					if (mm.length())
-					{
-						int precision = digits - mm.length();
-						if (precision < 0) precision = 1;	
-
-						format_f(x, precision, mm, nn);					
-					}
+					format_f(x, precision, mm, nn);					
 				}
-				// todo -- if mm is empty and nn has leading 0s, 
+			}
+
+			int fudge = 0;
+			if (mm.empty() && nn.front() == '0') {
+				// if mm is empty and nn has leading 0s, 
 				// drop the leading 0s and adjust the exponent
 				// accordingly.
 
-				d.sig = mm + nn;
-				d.exp = -nn.length();
-
-				if (d.sig.length() > 19)
-				{
-					d.exp += (d.sig.length() - 19);
-					d.sig.resize(19);
+				auto pos = nn.find_first_not_of('0');
+				if (pos != nn.npos && pos != 0) {
+					nn.erase(0, pos);
+					fudge = pos;
 				}
+			}
+
+			d.sig = mm + nn;
+			d.exp = -nn.length();
+			d.exp -= fudge;
+
+			if (d.sig.length() > 19)
+			{
+				d.exp += (d.sig.length() - 19);
+				d.sig.resize(19);
 			}
 
 			return d;
