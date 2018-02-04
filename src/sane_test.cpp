@@ -741,8 +741,19 @@ TEST_CASE( "double/extended conversion", "[floating_point]") {
 		CHECK((long double)fpi == HUGE_VALL);
 	}
 
+}
 
 
+TEST_CASE( "endian", "[floating_point]") {
+
+	SECTION("little endian long double 1.0") {
+		// x64 long double 1.0
+		uint8_t buffer[16] = {
+			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x80,0xff,0x3f,0x00,0x00,0x00,0x00,0x00,0x00
+		};
+		long double ld = fp::read_extended(fp::format<16, endian::little>{}, buffer);
+		CHECK(ld == 1.0L);
+	}
 }
 
 
@@ -864,3 +875,5 @@ TEST_CASE("x2dec 1.125", "[x2dec]") {
 	CHECK(d.exp == -6);
 	CHECK(d.sig == "1125000");
 }
+
+

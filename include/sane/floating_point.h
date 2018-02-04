@@ -245,6 +245,74 @@ namespace floating_point {
 	};
 
 
+	template<endian byte_order>
+	float read_single(format<4, byte_order>, const void *vp) {
+		constexpr size_t size = 4;
+		typedef float return_type;
+
+		static_assert(sizeof(return_type) == size, "float size");
+
+		typename std::aligned_storage<size, alignof(return_type)>::type buffer[1];
+
+		std::memcpy(buffer, vp, size);
+		reverse_bytes_if<size>(buffer, std::integral_constant<bool, byte_order != endian::native>{});
+		return *(return_type *)buffer;
+	}
+
+	template<endian byte_order>
+	double read_double(format<8, byte_order>, const void *vp) {
+		constexpr size_t size = 8;
+		typedef double return_type;
+
+		static_assert(sizeof(return_type) == size, "double size");
+
+		typename std::aligned_storage<size, alignof(return_type)>::type buffer[1];
+
+		std::memcpy(buffer, vp, size);
+		reverse_bytes_if<size>(buffer, std::integral_constant<bool, byte_order != endian::native>{});
+		return *(return_type *)buffer;
+	}
+
+
+	template<endian byte_order>
+	long double read_extended(format<8, byte_order> f, const void *vp) {
+		return read_double(f, vp);
+	}
+
+
+	/*
+	  sigh...
+	  gcc ppc and gcc aarm64 claim long double is 16-bits but it's really just a double
+	  with extra padding. (and ppc might actually be 2 doubles but it's weird.)
+	  usable extendeds are only availble on x86, x64, and maybe Apple's PPC.
+	 */
+	template<size_t size, endian byte_order>
+	long double read_extended(format<size, byte_order> f, const void *vp) {
+
+		constexpr size_t ldsize = sizeof(long double);
+		typedef long double return_type;
+
+		static_assert(size == 10 || size == 12 || size == 16, "extended size");
+
+		if (ldsize == 8) {
+			// long double is really a double. manually down-grade it.
+			info fpi;
+			fpi.read(f, vp);
+
+			return (return_type)fpi;
+		} else {
+
+			constexpr size_t ssize = ldsize > size ? ldsize : size;
+
+			typename std::aligned_storage<ssize, alignof(return_type)>::type buffer[1];
+
+			std::memset(buffer, 0, ssize);
+			std::memcpy(buffer, vp, size);
+			reverse_bytes_if<size>(buffer, std::integral_constant<bool, byte_order != endian::native>{});
+			return *(return_type *)buffer;
+		}
+	}
+
 } // floating point.
 
 
