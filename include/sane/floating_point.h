@@ -313,6 +313,63 @@ namespace floating_point {
 		}
 	}
 
+
+	template<endian byte_order>
+	void write_single(float x, format<4, byte_order>, void *vp) {
+		constexpr size_t size = 4;
+		typedef float return_type;
+
+		static_assert(sizeof(return_type) == size, "float size");
+
+		typename std::aligned_storage<size, alignof(return_type)>::type buffer[1];
+
+		std::memcpy(buffer, &x, size);
+		reverse_bytes_if<size>(buffer, std::integral_constant<bool, byte_order != endian::native>{});
+		std::memcpy(vp, buffer, size);
+	}
+
+	template<endian byte_order>
+	void write_double(double x, format<8, byte_order>, void *vp) {
+		constexpr size_t size = 8;
+		typedef double return_type;
+
+		static_assert(sizeof(return_type) == size, "double size");
+
+		typename std::aligned_storage<size, alignof(return_type)>::type buffer[1];
+
+		std::memcpy(buffer, &x, size);
+		reverse_bytes_if<size>(buffer, std::integral_constant<bool, byte_order != endian::native>{});
+		std::memcpy(vp, buffer, size);
+	}
+
+
+	template<size_t size, endian byte_order>
+	void write_extended(long double x, format<size, byte_order> f, void *vp) {
+
+		constexpr size_t ldsize = sizeof(long double);
+		typedef long double return_type;
+
+		static_assert(size == 10 || size == 12 || size == 16, "extended size");
+
+		constexpr size_t ssize = ldsize > size ? ldsize : size;
+		typename std::aligned_storage<ssize, alignof(return_type)>::type buffer[1];
+
+		if (ldsize == 8) {
+			// do it manually.
+			info fpi;
+			fpi.read(x);
+			fpi.write(f, vp);
+		} else {
+
+			std::memset(buffer, 0, ssize);
+			std::memcpy(buffer, &x, ldsize);
+			reverse_bytes_if<size>(buffer, std::integral_constant<bool, byte_order != endian::native>{});
+			std::memcpy(vp, buffer, size);
+		}
+	}
+
+
+
 } // floating point.
 
 
