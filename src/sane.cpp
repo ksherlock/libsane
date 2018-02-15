@@ -49,9 +49,19 @@ namespace {
 	int vasprintf(char **out, const char *fmt, va_list ap) {
 		int size;
 		char *cp;
+		char buffer[256];
 
-		size = vsnprintf(NULL, 0, fmt, ap);
+		size = vsnprintf(buffer, sizeof(buffer), fmt, ap);
 		if (size < 0) return size;
+
+		if (size < sizeof(buffer)) {
+			cp = strdup(buffer);
+			*out = cp;
+			if (!cp) return -1;
+
+			return size;
+		}
+
 		cp = (char *)malloc(size + 1);
 		*out = cp;
 
