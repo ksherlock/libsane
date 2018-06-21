@@ -51,16 +51,17 @@ namespace SANE {
 		;
 
 	nan = 'NAN'i 
-		>{ nan = true; } 
-		%check
-		%!check
+		#>{ nan = true; } 
+		%{ nan = true; checkpoint = fpc; }
+		%!{ nan = true; checkpoint = fpc; }
 		nantype?
 		;
 
 	infinity = 'INF'i
-		>{ nan = true; }
-		%{ nan = false; infinity = true; checkpoint = fpc; }
-		%!{ nan = false; infinity = true; checkpoint = fpc; };
+		#>{ nan = true; }
+		%{ infinity = true; checkpoint = fpc; }
+		%!{ infinity = true; checkpoint = fpc; }
+		;
 
 	exponent =
 		[eE]
@@ -99,7 +100,12 @@ namespace SANE {
 		unsigned_decimal
 	;
 
-	decimal_number = [ \t]* left_decimal;
+	decimal_number = [ \t]* 
+	#%eof{
+	#	nan = true;
+	#	nantype = 0x11;
+	#}
+	left_decimal;
 
 	main := decimal_number;
 
@@ -187,8 +193,14 @@ void str2dec(const std::string &s, uint16_t &index, decimal &d, uint16_t &vp)
 		int exp = 0;
 		std::string siga, sigb;
 
-		if (index >= s.size()) return;
-
+		/* grr... empty string is a valid N0011 */
+		if (index >= s.size()) {
+			vp = 1;
+			d.sig = "N0011";
+			d.exp = 0;
+			d.sgn = 0;
+			return;
+		}
 		/*
 		char *p = s.c_str();
 		char *pe = p + s.size();
@@ -218,15 +230,13 @@ void str2dec(const std::string &s, uint16_t &index, decimal &d, uint16_t &vp)
 		else if (nan)
 		{
 			d.sig = "N";
-			if (nantype)
-			{
-				const char *hexstr = "0123456789abcdef";
-				// 4-byte hex
-				d.sig.push_back(hexstr[(nantype >> 12) & 0x0f]);
-				d.sig.push_back(hexstr[(nantype >> 8) & 0x0f]);
-				d.sig.push_back(hexstr[(nantype >> 4) & 0x0f]);
-				d.sig.push_back(hexstr[(nantype >> 0) & 0x0f]);
-			}
+			nantype |= 0x4000;
+			const char *hexstr = "0123456789abcdef";
+			// 4-byte hex
+			d.sig.push_back(hexstr[(nantype >> 12) & 0x0f]);
+			d.sig.push_back(hexstr[(nantype >> 8) & 0x0f]);
+			d.sig.push_back(hexstr[(nantype >> 4) & 0x0f]);
+			d.sig.push_back(hexstr[(nantype >> 0) & 0x0f]);
 		}
 		else
 		{
@@ -236,8 +246,12 @@ void str2dec(const std::string &s, uint16_t &index, decimal &d, uint16_t &vp)
 		}
 
 		vp = cs != fpstr_error;
-		index = checkpoint - s.begin();
-
+		auto processed = checkpoint - s.begin();
+		if (processed == 0) {
+			d.sig = "N0011";
+			d.sgn = 0;
+			d.exp = 0;
+		} else index = processed;
 		return;
 }
 

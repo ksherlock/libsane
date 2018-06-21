@@ -317,6 +317,12 @@ TEST_CASE( "Dec2Str(Fixed)", "[dec2str]") {
 
 }
 
+/*
+ * SANE 65816/68000 tests:
+ * if no bytes processed, returns N0011 (NANASCBIN)
+ * NAN -> N4000 ; NAN(1) -> N4001
+ *
+ */
 TEST_CASE( "Str2Dec", "[str2dec]" ) {
 
 	// page 30, table 3-3
@@ -405,7 +411,7 @@ TEST_CASE( "Str2Dec", "[str2dec]" ) {
 		REQUIRE(index == 0);
 		REQUIRE(valid);
 
-		REQUIRE(d.sig == "N");
+		REQUIRE(d.sig == "N0011");
 		REQUIRE(d.sgn == 0);
 		REQUIRE(d.exp == 0);
 	}
@@ -421,6 +427,17 @@ TEST_CASE( "Str2Dec", "[str2dec]" ) {
 		REQUIRE(d.exp == 0);
 
 	}
+	SECTION( "Str2Dec('INFx')" ) {
+		index = 0;
+		SANE::str2dec("INFx", index, d, valid);
+		REQUIRE(index == 3);
+		REQUIRE(!valid);
+
+		REQUIRE(d.sig == "I");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+
+	}
 
 
 	SECTION( "Str2Dec('NAN(036)')" ) {
@@ -429,7 +446,7 @@ TEST_CASE( "Str2Dec", "[str2dec]" ) {
 		REQUIRE(index == 8);
 		REQUIRE(valid);
 
-		REQUIRE(d.sig == "N0024");
+		REQUIRE(d.sig == "N4024");
 		REQUIRE(d.sgn == 0);
 		REQUIRE(d.exp == 0);
 	}
@@ -440,7 +457,7 @@ TEST_CASE( "Str2Dec", "[str2dec]" ) {
 		REQUIRE(index == 9);
 		REQUIRE(valid);
 
-		REQUIRE(d.sig == "N0015");
+		REQUIRE(d.sig == "N4015");
 		REQUIRE(d.sgn == 1);
 		REQUIRE(d.exp == 0);
 	}
@@ -552,7 +569,168 @@ TEST_CASE( "Str2Dec", "[str2dec]" ) {
 	}
 
 
+	SECTION( "Str2Dec('12')") {
+		index = 0;
+		SANE::str2dec("12", index, d, valid);
+		REQUIRE(index == 2);
+		REQUIRE(valid);
 
+		REQUIRE(d.sig == "12");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	/* tested vs 65816 SANE */
+	SECTION( "Str2Dec(' 12E')" ) {
+		index = 0;
+		SANE::str2dec(" 12E", index, d, valid);
+		REQUIRE(index == 3);
+		REQUIRE(valid);
+		REQUIRE(d.sig == "12");
+	}
+
+	SECTION( "Str2Dec('12n')") {
+		index = 0;
+		SANE::str2dec("12n", index, d, valid);
+		REQUIRE(index == 2);
+		REQUIRE(valid == 0);
+
+		REQUIRE(d.sig == "12");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec(' 12n')") {
+		index = 0;
+		SANE::str2dec(" 12n", index, d, valid);
+		REQUIRE(index == 3);
+		REQUIRE(valid == 0);
+
+		REQUIRE(d.sig == "12");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('')") {
+		index = 0;
+		SANE::str2dec("", index, d, valid);
+		REQUIRE(index == 0);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N0011"); /* NANASCBIN */
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('  ')") {
+		index = 0;
+		SANE::str2dec("  ", index, d, valid);
+		REQUIRE(index == 0);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N0011"); /* NANASCBIN */
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('   ')") {
+		index = 0;
+		SANE::str2dec("   ", index, d, valid);
+		REQUIRE(index == 0);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N0011"); /* NANASCBIN */
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('  1')") {
+		index = 0;
+		SANE::str2dec("  1", index, d, valid);
+		REQUIRE(index == 3);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "1");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('  x')") {
+		index = 0;
+		SANE::str2dec("  x", index, d, valid);
+		REQUIRE(index == 0);
+		REQUIRE(valid == 0);
+
+		REQUIRE(d.sig == "N0011");  /* NANASCBIN */
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('N')") {
+		index = 0;
+		SANE::str2dec("N", index, d, valid);
+		REQUIRE(index == 0);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N0011");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('NA')") {
+		index = 0;
+		SANE::str2dec("NA", index, d, valid);
+		REQUIRE(index == 0);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N0011");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('NAN')") {
+		index = 0;
+		SANE::str2dec("NAN", index, d, valid);
+		REQUIRE(index == 3);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N4000");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('NAN(')") {
+		index = 0;
+		SANE::str2dec("NAN(", index, d, valid);
+		REQUIRE(index == 3);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N4000");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('NAN(1')") {
+		index = 0;
+		SANE::str2dec("NAN(1", index, d, valid);
+		REQUIRE(index == 3);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N4000");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
+
+	SECTION( "Str2Dec('NAN(1)'") {
+		index = 0;
+		SANE::str2dec("NAN(1)", index, d, valid);
+		REQUIRE(index == 6);
+		REQUIRE(valid == 1);
+
+		REQUIRE(d.sig == "N4001");
+		REQUIRE(d.sgn == 0);
+		REQUIRE(d.exp == 0);
+	}
 }
 
 
