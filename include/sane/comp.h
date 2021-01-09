@@ -64,18 +64,18 @@ namespace SANE {
 
 		explicit operator long double() const {
 			if (isnan(*this)) return make_nan<long double>(NANCOMP);
-			return _data;
+			return static_cast<long double>(_data);
 		}
 
 		explicit operator double() const {
 			if (isnan(*this)) return make_nan<double>(NANCOMP);
-			return _data;
-		}
+		    return static_cast<double>(_data);
+	    }
 
 		explicit operator float() const {
 			if (isnan(*this)) return make_nan<float>(NANCOMP);
-			return _data;
-		}
+		    return static_cast<float>(_data);
+	    }
 
 
 
@@ -95,7 +95,7 @@ namespace SANE {
 					if (t > INT64_MAX || t < -INT64_MAX) {
 						_data = NaN;
 					} else {
-						_data = t;
+						_data = static_cast<int64_t>(t);
 					}
 					break;
 			}
