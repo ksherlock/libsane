@@ -325,20 +325,9 @@ namespace SANE {
 		long double tmp = 0;
 		try {
 			size_t pos;
-			tmp = std::stold(d.sig, &pos);
-			if (pos != d.sig.length()) throw std::invalid_argument("");
-
-			int exp = d.exp;
-
-			while (exp > 0) {
-				tmp = tmp * 10.0;
-				exp--;
-			}
-
-			while (exp < 0) {
-				tmp = tmp / 10.0;
-				exp++;
-			}
+			std::string str = d.sig + "e" + std::to_string(d.exp);
+			tmp = std::stold(str, &pos);
+			if (pos != str.length()) throw std::invalid_argument("");
 
 		} catch(std::out_of_range &e) {
 			tmp = INFINITY;
