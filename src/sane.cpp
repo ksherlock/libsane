@@ -322,17 +322,11 @@ namespace SANE {
 		}
 
 
-		long double tmp = 0;
-		try {
-			size_t pos;
-			std::string str = d.sig + "e" + std::to_string(d.exp);
-			tmp = std::stold(str, &pos);
-			if (pos != str.length()) throw std::invalid_argument("");
-
-		} catch(std::out_of_range &e) {
-			tmp = INFINITY;
-			if (d.exp < 0) tmp = 0;
-		} catch(std::invalid_argument &e) {
+		std::string str = d.sig + "e" + std::to_string(d.exp);
+		const char *cstr = str.c_str();
+		char *end;
+		long double tmp = std::strtold(cstr, &end);
+		if (end-cstr != str.length()) {
 			tmp = make_nan<long double>(NANASCBIN);
 		}
 
