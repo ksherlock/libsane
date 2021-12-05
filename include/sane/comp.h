@@ -18,11 +18,11 @@ namespace SANE {
 	public:
 		constexpr static const uint64_t NaN = UINT64_C(0x8000000000000000);
 
-		comp(const comp &rhs) = default;
+		constexpr comp(const comp &rhs) = default;
 
-		explicit comp(int rhs) : _data(rhs) {}
-		explicit comp(int64_t rhs) : _data(rhs) {}
-		explicit comp(uint64_t rhs) : _data(rhs) {}
+		explicit constexpr comp(int rhs) : _data(rhs) {}
+		explicit constexpr comp(int64_t rhs) : _data(rhs) {}
+		explicit constexpr comp(uint64_t rhs) : _data(rhs) {}
 
 
 		explicit comp(float rhs) { read_from(rhs); }
@@ -54,11 +54,11 @@ namespace SANE {
 		}
 
 
-		explicit operator uint64_t() const {
+		explicit constexpr operator uint64_t() const {
 			return _data;
 		}
 
-		explicit operator int64_t() const {
+		explicit constexpr operator int64_t() const {
 			return _data;
 		}
 
