@@ -1054,4 +1054,240 @@ TEST_CASE("x2dec 1.125", "[x2dec]") {
 	CHECK(d.sig == "1125000");
 }
 
+TEST_CASE("x2dec_fixed_6", "[x2dec]") {
+
+	SANE::decform df{SANE::decform::FIXEDDECIMAL, 6};
+
+	SECTION(".0625") {
+		SANE::decimal d = SANE::x2dec(1.0 / 16.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -6);
+		CHECK(d.sig == "62500");
+	}
+
+	SECTION(".125") {
+		SANE::decimal d = SANE::x2dec(1.0 / 8.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -6);
+		CHECK(d.sig == "125000");
+	}
+
+	SECTION("1.0") {
+		SANE::decimal d = SANE::x2dec(1.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -6);
+		CHECK(d.sig == "1000000");
+	}
+
+
+	SECTION("-1.0") {
+		SANE::decimal d = SANE::x2dec(-1.0, df);
+		CHECK(d.sgn == 1);
+		CHECK(d.exp == -6);
+		CHECK(d.sig == "1000000");
+	}
+
+	SECTION("1.0625") {
+		SANE::decimal d = SANE::x2dec(1.0 + 1.0 / 16.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -6);
+		CHECK(d.sig == "1062500");
+	}
+
+
+	SECTION("1234.0") {
+		SANE::decimal d = SANE::x2dec(1234.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -6);
+		CHECK(d.sig == "1234000000");
+	}
+
+}
+
+TEST_CASE("x2dec_fixed_2", "[x2dec]") {
+
+	SANE::decform df{SANE::decform::FIXEDDECIMAL, 2};
+
+	SECTION(".0625") {
+		SANE::decimal d = SANE::x2dec(1.0 / 16.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "6");
+	}
+
+	SECTION(".125") {
+		SANE::decimal d = SANE::x2dec(1.0 / 8.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "12");
+	}
+
+	SECTION("1.0") {
+		SANE::decimal d = SANE::x2dec(1.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "100");
+	}
+
+
+	SECTION("-1.0") {
+		SANE::decimal d = SANE::x2dec(-1.0, df);
+		CHECK(d.sgn == 1);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "100");
+	}
+
+	SECTION("1.0625") {
+		SANE::decimal d = SANE::x2dec(1.0 + 1.0 / 16.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "106");
+	}
+
+
+	SECTION("1234.0") {
+		SANE::decimal d = SANE::x2dec(1234.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "123400");
+	}
+
+	SECTION("0") {
+		SANE::decimal d = SANE::x2dec(0.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == 0);
+		CHECK(d.sig == "0");
+	}
+
+	SECTION(".0078125") {
+		SANE::decimal d = SANE::x2dec(1.0 / 128.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "1");
+	}
+
+	SECTION("1 / 256") {
+		SANE::decimal d = SANE::x2dec(1.0 / 256.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "0");
+	}
+
+
+}
+
+TEST_CASE("x2dec_float_2", "[x2dec]") {
+
+	SANE::decform df{SANE::decform::FLOATDECIMAL, 2};
+
+	SECTION(".0625") {
+		SANE::decimal d = SANE::x2dec(1.0 / 16.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -3);
+		CHECK(d.sig == "62");
+	}
+
+	SECTION(".125") {
+		SANE::decimal d = SANE::x2dec(1.0 / 8.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "12");
+	}
+
+	SECTION("1.0") {
+		SANE::decimal d = SANE::x2dec(1.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -1);
+		CHECK(d.sig == "10");
+	}
+
+
+	SECTION("-1.0") {
+		SANE::decimal d = SANE::x2dec(-1.0, df);
+		CHECK(d.sgn == 1);
+		CHECK(d.exp == -1);
+		CHECK(d.sig == "10");
+	}
+
+	SECTION("1.0625") {
+		SANE::decimal d = SANE::x2dec(1.0 + 1.0 / 16.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -1);
+		CHECK(d.sig == "11");
+	}
+
+
+	SECTION("1234.0") {
+		SANE::decimal d = SANE::x2dec(1234.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == 2);
+		CHECK(d.sig == "12");
+	}
+
+
+	SECTION("0") {
+		SANE::decimal d = SANE::x2dec(0.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == 0);
+		CHECK(d.sig == "0");
+	}
+
+	SECTION(".0078125") {
+		SANE::decimal d = SANE::x2dec(1.0 / 128.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -4);
+		CHECK(d.sig == "78");
+	}
+
+
+}
+
+TEST_CASE("x2dec_float_6", "[x2dec]") {
+
+	SANE::decform df{SANE::decform::FLOATDECIMAL, 6};
+
+	SECTION(".0625") {
+		SANE::decimal d = SANE::x2dec(1.0 / 16.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -7);
+		CHECK(d.sig == "625000");
+	}
+
+	SECTION(".125") {
+		SANE::decimal d = SANE::x2dec(1.0 / 8.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -6);
+		CHECK(d.sig == "125000");
+	}
+
+	SECTION("1.0") {
+		SANE::decimal d = SANE::x2dec(1.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -5);
+		CHECK(d.sig == "100000");
+	}
+
+
+	SECTION("-1.0") {
+		SANE::decimal d = SANE::x2dec(-1.0, df);
+		CHECK(d.sgn == 1);
+		CHECK(d.exp == -5);
+		CHECK(d.sig == "100000");
+	}
+
+	SECTION("1.0625") {
+		SANE::decimal d = SANE::x2dec(1.0 + 1.0 / 16.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -5);
+		CHECK(d.sig == "106250");
+	}
+
+
+	SECTION("1234.0") {
+		SANE::decimal d = SANE::x2dec(1234.0, df);
+		CHECK(d.sgn == 0);
+		CHECK(d.exp == -2);
+		CHECK(d.sig == "123400");
+	}
+}
 

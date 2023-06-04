@@ -407,13 +407,16 @@ namespace SANE {
 	decimal x2dec(long double x, const decform &df) {
 
 		/*
-		 * SANE pp 30, 31
+		 * SANE pp 27 - 31
 		 *
-		 * Floating style:
+		 * Floating style (0):
 		 * [-| ]m[.nnn]e[+|-]dddd
+		 * digits is the number of significant digits
 		 *
-		 * Fixed style:
+		 * Fixed style (1):
 		 * [-]mmm[.nnn]
+		 * digits is the number of digits to the right of the decimal point
+		 * (left if negative)
 		 */
 
 		decimal d;
@@ -435,6 +438,8 @@ namespace SANE {
 				return d;
 
 			case FP_NAN: {
+				// TODO -- Macintosh returns N + 16-digit hex number.
+				// TODO -- Apple IIgs returns N + 6-digit hex number.
 				// NAN type encoded in the sig.
 					char buffer[20]; // 16 + 2 needed
 					// todo -- use 4 hex digits if possible...
@@ -460,28 +465,19 @@ namespace SANE {
 		x = abs(x);
 
 
-		if (x < 1.0 && df.style == decform::FLOATDECIMAL)
-		{
-			std::string mm;
-			std::string nn;
-
-			format_e(x, digits - 1, mm, nn, d.exp);
-
-			d.sig = mm + nn;
-
-			// better be < 0...
-			if (d.exp < 0)
-				d.exp -= nn.length();
-
-			return d;
-		}
-		else // x > 1
-		{
+		if (df.style == decform::FIXEDDECIMAL) {
 
 			std::string mm;
 			std::string nn;
+
+			if (digits < 0) {
+				d.sig = "0";
+				d.exp = -digits;
+			}
 
 			format_f(x, digits, mm, nn);
+
+			d.exp = -digits;
 
 			if (mm.empty() && nn.empty())
 			{
@@ -490,64 +486,38 @@ namespace SANE {
 				return d;
 			}
 
-			// if nn is empty (or 0s), this is a large number,
-			// and we don't have to worry about the fraction.
-			if (nn.empty())
-			{
-				d.exp = 0;
-
-				if (df.style == decform::FIXEDDECIMAL) digits = 19; // todo - SIGDIGITS-1?
-
-				// limit the length.
-				if (mm.length() > digits)
-				{
-					d.exp = mm.length() - digits;
-					mm.resize(digits);
-				}
-				d.sig = std::move(mm);
+			if (mm.empty()) {
+				// don't include leading 0s.
+				auto iter = nn.begin();
+				auto end = nn.end();
+				while (iter != end && *iter == '0') ++iter;
+				d.sig.assign(iter, end);
 				return d;
 			}
 
-			if (df.style == decform::FIXEDDECIMAL)
-			{
-				// digits is the total size, mm + nn
-				// re-format with new precision.
-				// this is getting repetitive...
+			while(nn.length() < digits) nn.push_back('0');
+			d.sig = std::move(mm);
+			d.sig.append(nn);
+			return d;
+		} else {
 
-				if (mm.length())
-				{
-					int precision = digits; // - mm.length();
-					if (precision < 0) precision = 1;	
+			// float
 
-					format_f(x, precision, mm, nn);					
-				}
-			}
+			std::string mm;
+			std::string nn;
+			int16_t exp = 0;
 
-			int fudge = 0;
-			if (mm.empty() && nn.front() == '0') {
-				// if mm is empty and nn has leading 0s, 
-				// drop the leading 0s and adjust the exponent
-				// accordingly.
+			int dm1 = digits - 1;
+			if (dm1 < 0) dm1 = 0;
 
-				auto pos = nn.find_first_not_of('0');
-				if (pos != nn.npos && pos != 0) {
-					nn.erase(0, pos);
-					fudge = pos;
-				}
-			}
+			format_e(x, dm1, mm, nn, exp);
 
-			d.sig = mm + nn;
-			d.exp = -nn.length();
-			d.exp -= fudge;
-
-			if (d.sig.length() > 19)
-			{
-				d.exp += (d.sig.length() - 19);
-				d.sig.resize(19);
-			}
-
+			d.sig = std::move(mm);
+			d.sig.append(nn);
+			d.exp = exp - nn.length();
 			return d;
 		}
+
 	}
 
 
@@ -567,6 +537,7 @@ namespace SANE {
 		d.sig.resize(digits);
 
 		// round up...
+		// TODO -- should round towards even number
 		while (!d.sig.empty() && ru) {
 			auto &c = d.sig.back();
 			++c;
