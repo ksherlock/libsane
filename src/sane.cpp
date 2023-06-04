@@ -334,6 +334,10 @@ namespace SANE {
 		return tmp;
 	}
 
+	static bool all_zero(const std::string &s) {
+		return std::all_of(s.begin(), s.end(), [](char c){ return c == '0'; });
+	}
+
 
 	static void format_f(long double x, int precision, std::string &mm, std::string &nn)
 	{
@@ -366,6 +370,7 @@ namespace SANE {
 			nn.clear();
 	}
 
+
 	static void format_e(long double x, int precision, std::string &mm, std::string &nn, int16_t &exp)
 	{
 		char *buffer = nullptr;
@@ -375,7 +380,7 @@ namespace SANE {
 		nn.clear();
 
 		if (precision < 0) precision = 0;
-		if (precision > 19) precision = 19;
+		// if (precision > 19) precision = 19;
 
 		int length = asprintf(&buffer, "%.*Le", precision, x);
 		// output mm . nn e[+-]exp
@@ -421,8 +426,11 @@ namespace SANE {
 
 		decimal d;
 		int digits = df.digits;
-		if (digits < 0) digits = 0;
-		if (digits > 19) digits = 19;
+		// SANE requires at least 18 digits.
+		// IIgs sane allows 28 digits
+		// MacOS sane allows 20 digits.
+		// if (digits < 0) digits = 0;
+		if (digits > 32) digits = 32;
 
 		fp::info fpi(x);
 		//fprintf(stderr, "%02x %02x %d %016llx\n", fpi.sign, fpi.one, fpi.exp, fpi.sig);
