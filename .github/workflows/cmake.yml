@@ -37,7 +37,18 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --config "$BUILD_TYPE"
+      run: |
+        case $RUNNER_OS in
+          Linux)
+            jobs=$(nproc)
+            ;;
+          macOS)
+            jobs=$(sysctl -n hw.activecpu)
+            ;;
+          *)
+            jobs=1
+        esac
+        cmake --build build --config "$BUILD_TYPE" --parallel "$jobs"
       
     - name: Test
       working-directory: build
