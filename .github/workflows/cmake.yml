@@ -8,15 +8,28 @@ env:
 
 jobs:
   build:
-    runs-on: macos-latest
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v6
       with:
         submodules: true
 
-    - name: Brew
-      run: brew install ragel
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        case $RUNNER_OS in
+          Linux)
+            sudo apt-get install ragel
+            ;;
+          macOS)
+            brew install ragel
+            ;;
+        esac
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build
